@@ -1,0 +1,2 @@
+# NiggaratorIDK
+GOD! SHOW MERCY PLS
