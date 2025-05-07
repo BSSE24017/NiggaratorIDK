@@ -9,7 +9,7 @@ public:
     void add(const T& item) { items.push_back(item); }
     T& operator[](size_t idx) { return items.at(idx); }
     size_t size() const { return items.size(); }
-    typename std::vector<T>::iterator begin() { return items.begin(); }
-    typename std::vector<T>::iterator end() { return items.end(); }
+    typename std::vector<T>::const_iterator begin() const { return items.begin(); }
+    typename std::vector<T>::const_iterator end() const { return items.end(); }
     void clear() { items.clear(); }
 }; 
