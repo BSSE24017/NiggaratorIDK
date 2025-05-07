@@ -4,6 +4,32 @@ using namespace std;
 
 CrimeRegistry* CrimeRegistry::instance = nullptr;
 
+void Case::displayDetails() const {
+	cout << "Case Type: " << type << ", ID: " << caseId << ", Severity: " << severity;
+	if (location) {
+		cout << ", " << *location;
+	}
+	cout << endl;
+}
+
+void Theft::displayDetails() const {
+	cout << "Theft Case - ID: " << caseId << ", Stolen Value: $" << stolenValue << ", Severity: " << severity;
+	if (location) {
+		cout << ", " << *location;
+	}
+	cout << endl;
+}
+
+void Assault::displayDetails() const {
+	cout << "Assault Case - ID: " << caseId
+		<< ", Weapon Used: " << (weaponUsed ? "Yes" : "No")
+		<< ", Severity: " << severity;
+	if (location) {
+		cout << ", " << *location;
+	}
+	cout << endl;
+}
+
 void CrimeManager::addCase(Case* c) {
 	cases.add(c);
 	caseMap[c->getId()] = c;
@@ -35,6 +61,13 @@ void CrimeManager::addCase(int id, string type, double extraInfo) {
 		newCase = new Case(type, id, extraInfo);  // extraInfo is severity
 
 	addCase(newCase);
+}
+
+// Location methods (aggregation)
+Location* CrimeManager::addLocation(const string& address, const string& city, const string& state) {
+	Location* loc = new Location(address, city, state);
+	locations.add(loc);
+	return loc;
 }
 
 Case* CrimeManager::findCase(int id) {
@@ -149,6 +182,7 @@ void crimeMenu() {
 		cout << "3. List Cases By Priority\n";
 		cout << "4. Save\n";
 		cout << "5. Find Case\n";
+		cout << "6. Add Location to Case\n";
 		cout << "0. Back\n";
 		cout << "Choice: ";
 		cin >> choice;
@@ -180,7 +214,6 @@ void crimeMenu() {
 				cin >> severity;
 				mgr.addCase(id, type, severity);
 			}
-
 		}
 		else if (choice == 2) {
 			mgr.listCases();
@@ -201,6 +234,30 @@ void crimeMenu() {
 			if (found) {
 				cout << "Found case: ";
 				found->displayDetails();  // Polymorphic call
+			}
+			else {
+				cout << "Case not found.\n";
+			}
+		}
+		else if (choice == 6) {
+			int id;
+			string address, city, state;
+			cout << "Enter Case ID to add location: ";
+			cin >> id;
+
+			Case* found = mgr.findCase(id);
+			if (found) {
+				cin.ignore();
+				cout << "Enter address: ";
+				getline(cin, address);
+				cout << "Enter city: ";
+				getline(cin, city);
+				cout << "Enter state: ";
+				getline(cin, state);
+
+				Location* loc = mgr.addLocation(address, city, state);
+				found->setLocation(loc);
+				cout << "Location added to case.\n";
 			}
 			else {
 				cout << "Case not found.\n";
