@@ -1,0 +1,21 @@
+[
+    {
+        "area": "Model Town",
+        "assignedConstables": [
+            {
+                "assignedToPatrol": false,
+                "id": 3,
+                "name": "D",
+                "rank": "Constable",
+                "role": "Constable",
+                "tasks": []
+            }
+        ],
+        "endTime": "",
+        "logs": [],
+        "patrolId": "P1",
+        "startTime": "Started",
+        "status": "Active",
+        "vehicleId": 1
+    }
+]
