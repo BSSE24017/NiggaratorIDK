@@ -5,52 +5,137 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include "nlohmann/json.hpp"
 
-// Inheritance
-class Person {
-public:
-    virtual std::string getRole() const = 0;
-    virtual ~Person() {}
-};
+using json = nlohmann::json;
+using namespace std;
 
-class Officer : public Person {
+// Forward declarations
+class SHO;
+class CO;
+class ASI;
+class HeadConstable;
+class Constable;
+
+class Officer {
 protected:
-    std::string name;
+    string name;
     int id;
+    string rank;
+    vector<string> tasks;
+
 public:
-    Officer(std::string n = "", int i = 0) : name(n), id(i) {}
-    virtual std::string getRole() const override { return "Officer"; }
+    static int nextId;  // Static counter for unique IDs
+    Officer(string n = "", int i = -1, string r = "") : name(n), rank(r) {
+        id = (i == -1) ? nextId++ : i;
+    }
+    virtual ~Officer() = default;
+
+    // Basic getters and setters
     int getId() const { return id; }
-    std::string getName() const { return name; }
+    string getName() const { return name; }
+    string getRank() const { return rank; }
+    void setRank(const string& r) { rank = r; }
+    
+    // Task management
+    void addTask(const string& task) { tasks.push_back(task); }
+    void removeTask(size_t index) { 
+        if (index < tasks.size()) tasks.erase(tasks.begin() + index); 
+    }
+    const vector<string>& getTasks() const { return tasks; }
+    void clearTasks() { tasks.clear(); }
+    
+    // Virtual functions for rank-specific operations
+    virtual string getRole() const = 0;
+    virtual void performDuty() const = 0;
+    virtual vector<string> getResponsibilities() const = 0;
+    
+    // JSON serialization
+    virtual json toJson() const {
+        json j;
+        j["name"] = name;
+        j["id"] = id;
+        j["rank"] = rank;
+        j["tasks"] = tasks;
+        j["role"] = getRole();
+        return j;
+    }
+    
+    // JSON deserialization
+    static Officer* fromJson(const json& j);
+    
     // Operator Overloading
     bool operator==(const Officer& other) const { return id == other.id; }
-    friend std::ostream& operator<<(std::ostream& os, const Officer& o) {
-        os << o.name << " (" << o.id << ")";
+    friend ostream& operator<<(ostream& os, const Officer& o) {
+        os << o.name << " (" << o.id << ") - " << o.rank;
         return os;
     }
 };
 
 class SHO : public Officer {
 public:
-    SHO(std::string n = "", int i = 0) : Officer(n, i) {}
-    std::string getRole() const override { return "SHO"; }
+    SHO(string n = "", int i = -1) : Officer(n, i, "SHO") {}
+    
+    string getRole() const override { return "SHO"; }
+    void performDuty() const override;
+    vector<string> getResponsibilities() const override;
+};
+
+class CO : public Officer {
+public:
+    CO(string n = "", int i = -1) : Officer(n, i, "CO") {}
+    
+    string getRole() const override { return "CO"; }
+    void performDuty() const override;
+    vector<string> getResponsibilities() const override;
+};
+
+class ASI : public Officer {
+public:
+    ASI(string n = "", int i = -1) : Officer(n, i, "ASI") {}
+    
+    string getRole() const override { return "ASI"; }
+    void performDuty() const override;
+    vector<string> getResponsibilities() const override;
+};
+
+class HeadConstable : public Officer {
+public:
+    HeadConstable(string n = "", int i = -1) : Officer(n, i, "Head Constable") {}
+    
+    string getRole() const override { return "Head Constable"; }
+    void performDuty() const override;
+    vector<string> getResponsibilities() const override;
 };
 
 class Constable : public Officer {
 public:
-    Constable(std::string n = "", int i = 0) : Officer(n, i) {}
-    std::string getRole() const override { return "Constable"; }
+    Constable(string n = "", int i = -1) : Officer(n, i, "Constable") {}
+    
+    string getRole() const override { return "Constable"; }
+    void performDuty() const override;
+    vector<string> getResponsibilities() const override;
 };
 
 // Composition: OfficerManager "has" officers
 class OfficerManager {
-    ListTemplate<Officer> officers;
-    std::map<int, Officer> officerMap;
+    ListTemplate<Officer*> officers;  // Changed to store pointers
+    map<int, Officer*> officerMap;  // Changed to store pointers
 public:
-    void addOfficer(const Officer& o);
+    ~OfficerManager();
+    void addOfficer(Officer* o);
     void listOfficers();
     void save();
     void load();
+    
+    // JSON methods
+    json toJson() const;
+    void fromJson(const json& j);
+    void saveToJson(const string& filename);
+    void loadFromJson(const string& filename);
+    
+    // Getter for officers
+    const ListTemplate<Officer*>& getOfficers() const { return officers; }
 };
 
 // Singleton

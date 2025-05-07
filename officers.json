@@ -1,0 +1,27 @@
+{
+    "officers": [
+        {
+            "id": 1,
+            "name": "a",
+            "rank": "SHO",
+            "role": "SHO",
+            "tasks": []
+        },
+        {
+            "id": 2,
+            "name": "b",
+            "rank": "Constable",
+            "role": "Constable",
+            "tasks": [
+                "Fine overspeeding"
+            ]
+        },
+        {
+            "id": 3,
+            "name": "c",
+            "rank": "Head Constable",
+            "role": "Head Constable",
+            "tasks": []
+        }
+    ]
+}
