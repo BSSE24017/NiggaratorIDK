@@ -1,5 +1,8 @@
 #include "CrimeModule.h"
 #include <algorithm> // Added for std::sort
+#include <fstream>
+using json = nlohmann::json;
+
 using namespace std;
 
 CrimeRegistry* CrimeRegistry::instance = nullptr;

@@ -21,7 +21,7 @@ int main() {
             case 1: officerMenu(); break;
             case 2: crimeMenu(); break;
             case 3: forensicsMenu(); break;
-            case 4: patrolVehiclesMenu(); break;
+            //case 4: patrolVehiclesMenu(); break;
             case 5: jailMenu(); break;
         }
     } while(choice != 0);

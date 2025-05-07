@@ -6,6 +6,9 @@
 #include <vector>
 #include <map>
 #include <algorithm> // Added for std::sort
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 using namespace std;
 
 // Forward declaration for Location class
