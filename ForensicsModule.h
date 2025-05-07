@@ -1,23 +1,30 @@
-#pragma once
+#ifndef FORENSICSMODULE_H
+#define FORENSICSMODULE_H
+
+
 #include "ListTemplate.h"
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <map>
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+using namespace std;
+
 
 class ForensicExpert {
 protected:
-    std::string name;
+    string name;
     int expertId;
 public:
-    ForensicExpert(std::string n = "", int id = 0) : name(n), expertId(id) {}
-    virtual std::string getSpecialty() const = 0;
+    ForensicExpert(string n = "", int id = 0) : name(n), expertId(id) {}
+    virtual string getSpecialty() const = 0;
     int getId() const { return expertId; }
-    std::string getName() const { return name; }
+    string getName() const { return name; }
     virtual ~ForensicExpert() {}
     bool operator==(const ForensicExpert& other) const { return expertId == other.expertId; }
-    friend std::ostream& operator<<(std::ostream& os, const ForensicExpert& f) {
+    friend ostream& operator<<(ostream& os, const ForensicExpert& f) {
         os << f.name << " (ID: " << f.expertId << ")";
         return os;
     }
@@ -25,26 +32,30 @@ public:
 
 class LabTechnician : public ForensicExpert {
 public:
-    LabTechnician(std::string n = "", int id = 0) : ForensicExpert(n, id) {}
-    std::string getSpecialty() const override { return "Lab Technician"; }
+    LabTechnician(string n = "", int id = 0) : ForensicExpert(n, id) {}
+    string getSpecialty() const override { return "Lab Technician"; }
 };
 
 class FieldAgent : public ForensicExpert {
 public:
-    FieldAgent(std::string n = "", int id = 0) : ForensicExpert(n, id) {}
-    std::string getSpecialty() const override { return "Field Agent"; }
+    FieldAgent(string n = "", int id = 0) : ForensicExpert(n, id) {}
+    string getSpecialty() const override { return "Field Agent"; }
 };
 
 class ForensicLab {
     ListTemplate<LabTechnician> labTechs;
     ListTemplate<FieldAgent> fieldAgents;
-    std::map<int, ForensicExpert*> expertMap; // For demonstration, not for ownership
+    map<int, ForensicExpert*> expertMap; // For demonstration, not for ownership
 public:
     void addLabTech(const LabTechnician& e);
     void addFieldAgent(const FieldAgent& e);
     void listExperts();
     void save();
     void load();
+    void addLabTech(const string& name, int id) {
+        addLabTech(LabTechnician(name, id));
+    }
+    
 };
 
 class ForensicLabRegistry {
@@ -57,3 +68,6 @@ public:
 };
 
 void forensicsMenu(); 
+
+
+#endif // FORENSICSMODULE_H
