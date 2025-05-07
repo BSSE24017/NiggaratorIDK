@@ -19,16 +19,24 @@ protected:
 	string type;
 	int caseId;
 	double severity;  
-	Location* location; // Aggregation: Case has-a Location
+	Location* location; // Association(specifically aggregation )
 
 public:
 	Case(string t = "", int id = 0, double sev = 0.0) : type(t), caseId(id), severity(sev), location(nullptr) {}
 
 	// Setters
-	void setType(const string& t) { type = t; }
-	void setId(int id) { caseId = id; }
-	void setSeverity(double sev) { severity = sev; }
-	void setLocation(Location* loc) { location = loc; }
+	void setType(const string& t) {
+		type = t;
+	}
+	void setId(int id) {
+		caseId = id;
+	}
+	void setSeverity(double sev) {
+		severity = sev; 
+	}
+	void setLocation(Location* loc) {
+		location = loc; 
+	}
 
 	//getters
 	virtual string getType() const {
@@ -134,7 +142,8 @@ public:
 };
 
 class CrimeManager {
-	ListTemplate<Case*> cases;
+	//template class usage
+	ListTemplate<Case*> cases; //aggregation
 	map<int, Case*> caseMap;
 	ListTemplate<Location*> locations; // Added locations list - aggregation
 
