@@ -109,6 +109,120 @@ void CrimeManager::listCasesByPriority() {
 }
 
 void CrimeManager::save() {
+	// Create a JSON array to store cases
+	json casesJson = json::array();
+
+	for (auto& c : cases) {
+		// Create a JSON object for each case
+		json caseJson;
+		caseJson["id"] = c->getId();
+		caseJson["type"] = c->getType();
+		caseJson["severity"] = c->getSeverity();
+
+		// Add location information if available
+		if (c->getLocation()) {
+			caseJson["location"] = {
+				{"address", c->getLocation()->getAddress()},
+				{"city", c->getLocation()->getCity()},
+				{"state", c->getLocation()->getState()}
+			};
+		}
+
+		// Add type-specific information
+		if (c->getType() == "Theft") {
+			Theft* theft = dynamic_cast<Theft*>(c);
+			if (theft) {
+				caseJson["stolenValue"] = theft->getStolenValue();
+			}
+		}
+		else if (c->getType() == "Assault") {
+			Assault* assault = dynamic_cast<Assault*>(c);
+			if (assault) {
+				caseJson["weaponUsed"] = assault->wasWeaponUsed();
+			}
+		}
+
+		// Add this case to the array
+		casesJson.push_back(caseJson);
+	}
+
+	// Write JSON to file
+	ofstream file("crimes.json");
+	file << casesJson.dump(4); // Indent with 4 spaces for better readability
+	file.close();
+}
+
+void CrimeManager::load() {
+	// Clean up previous data
+	for (auto& pair : caseMap) {
+		delete pair.second;
+	}
+	cases.clear();
+	caseMap.clear();
+
+	// Clean up locations
+	for (auto& loc : locations) {
+		delete loc;
+	}
+	locations.clear();
+
+	try {
+		// Open and read the JSON file
+		ifstream file("crimes.json");
+		if (!file.is_open()) {
+			cout << "No saved data found or could not open file." << endl;
+			return;
+		}
+
+		json casesJson;
+		file >> casesJson;
+		file.close();
+
+		// Process each case in the JSON array
+		for (const auto& caseJson : casesJson) {
+			int id = caseJson["id"];
+			string type = caseJson["type"];
+
+			Case* newCase = nullptr;
+
+			// Create the appropriate case type
+			if (type == "Theft") {
+				double stolenValue = caseJson.contains("stolenValue") ? caseJson["stolenValue"].get<double>() : 0.0;
+				Theft* theft = new Theft(id, stolenValue);
+				theft->setSeverity(caseJson["severity"]);
+				newCase = theft;
+			}
+			else if (type == "Assault") {
+				bool weaponUsed = caseJson.contains("weaponUsed") ? caseJson["weaponUsed"].get<bool>() : false;
+				Assault* assault = new Assault(id, weaponUsed);
+				assault->setSeverity(caseJson["severity"]);
+				newCase = assault;
+			}
+			else {
+				newCase = new Case(type, id, caseJson["severity"]);
+			}
+
+			// Check if location data exists
+			if (caseJson.contains("location")) {
+				string address = caseJson["location"]["address"];
+				string city = caseJson["location"]["city"];
+				string state = caseJson["location"]["state"];
+
+				Location* loc = addLocation(address, city, state);
+				newCase->setLocation(loc);
+			}
+
+			// Add the case to our collections
+			addCase(newCase);
+		}
+
+		cout << "Loaded " << cases.size() << " cases from file." << endl;
+	}
+	catch (const exception& e) {
+		cout << "Error loading data: " << e.what() << endl;
+	}
+}
+/*void CrimeManager::save() {
 	std::ofstream file("data/crimes.txt");
 	for (auto& c : cases) {
 		file << c->getId() << "," << c->getType();
@@ -165,7 +279,7 @@ void CrimeManager::load() {
 		}
 	}
 	file.close();
-}
+}*/
 
 CrimeRegistry* CrimeRegistry::getInstance() {
 	if (!instance) instance = new CrimeRegistry();

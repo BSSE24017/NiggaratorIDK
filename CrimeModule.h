@@ -18,7 +18,7 @@ class Case {
 protected:
 	string type;
 	int caseId;
-	double severity;  // Added severity level
+	double severity;  
 	Location* location; // Aggregation: Case has-a Location
 
 public:
@@ -61,7 +61,6 @@ public:
 	}
 };
 
-// Location class for aggregation
 class Location {
 private:
 	string address;
@@ -99,7 +98,7 @@ public:
 	// Setter
 	void setStolenValue(double value) { stolenValue = value; }
 
-	// Getter (only one version)
+	// Getter
 	double getStolenValue() const { return stolenValue; }
 
 	// Polymorphism: override the base class method
@@ -121,18 +120,16 @@ public:
 
 	// Setter
 	void setWeaponUsed(bool weapon) { weaponUsed = weapon; }
-
+	// Getter 
+	bool wasWeaponUsed() const {
+		return weaponUsed;
+	}
 	// Polymorphism: override the base class method
 	void displayDetails() const override;
 
 	// Override getPriority to account for weapon use
 	double getPriority() const override {
 		return severity + (weaponUsed ? 3.0 : 0.0);  // Weapon use increases priority
-	}
-
-	// Getter for weapon status
-	bool wasWeaponUsed() const {
-		return weaponUsed;
 	}
 };
 
