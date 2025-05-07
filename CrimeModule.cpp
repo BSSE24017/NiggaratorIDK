@@ -222,65 +222,6 @@ void CrimeManager::load() {
 		cout << "Error loading data: " << e.what() << endl;
 	}
 }
-/*void CrimeManager::save() {
-	std::ofstream file("data/crimes.txt");
-	for (auto& c : cases) {
-		file << c->getId() << "," << c->getType();
-
-		// Add extra information based on case type
-		if (c->getType() == "Theft") {
-			Theft* theft = dynamic_cast<Theft*>(c);
-			if (theft) {
-				file << "," << theft->getStolenValue();
-			}
-		}
-		else if (c->getType() == "Assault") {
-			Assault* assault = dynamic_cast<Assault*>(c);
-			if (assault) {
-				file << "," << (assault->wasWeaponUsed() ? "1" : "0");
-			}
-		}
-		file << "\n";
-	}
-	file.close();
-}
-
-void CrimeManager::load() {
-	// Clean up previous data
-	for (auto& pair : caseMap) {
-		delete pair.second;
-	}
-	cases.clear();
-	caseMap.clear();
-
-	ifstream file("data/crimes.txt");
-	string line;
-	while (getline(file, line)) {
-		int id;
-		string type;
-		size_t pos = line.find(',');
-		if (pos == string::npos) continue;
-
-		id = stoi(line.substr(0, pos));
-		string remainder = line.substr(pos + 1);
-
-		pos = remainder.find(',');
-		if (pos == string::npos) {
-			// Simple case with no extra info
-			type = remainder;
-			addCase(id, type);
-		}
-		else {
-			// Case with extra info
-			type = remainder.substr(0, pos);
-			double extraInfo = stod(remainder.substr(pos + 1));
-
-			addCase(id, type, extraInfo);
-		}
-	}
-	file.close();
-}*/
-
 CrimeRegistry* CrimeRegistry::getInstance() {
 	if (!instance) instance = new CrimeRegistry();
 	return instance;
