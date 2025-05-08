@@ -8,6 +8,7 @@
 #include <algorithm> 
 #include <sstream> // For string stream operations
 #include "nlohmann/json.hpp"
+#include "OfficerModule.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -23,12 +24,13 @@ protected:
     Location* location; // Association(specifically aggregation)
     string description; 
     string reportedBy; 
-    string date; 
+    string date;
+    Prosecutor* assignedProsecutor; // New field for assigned Prosecutor
 
 public:
     Case(string t = "", int id = 0, double sev = 0.0)
         : type(t), caseId(id), severity(sev), location(nullptr),
-        description(""), reportedBy(""), date("") {}
+        description(""), reportedBy(""), date(""), assignedProsecutor(nullptr) {}
 
     // Setters
     void setType(const string& t) {
@@ -52,6 +54,9 @@ public:
     void setDate(const string& d) {
         date = d;
     }
+    void setAssignedProsecutor(Prosecutor* prosecutor) {
+        assignedProsecutor = prosecutor;
+    }
 
     // Getters
     virtual string getType() const {
@@ -65,6 +70,7 @@ public:
     string getDescription() const { return description; }
     string getReportedBy() const { return reportedBy; }
     string getDate() const { return date; }
+    Prosecutor* getAssignedProsecutor() const { return assignedProsecutor; }
 
     // Polymorphism
     virtual void displayDetails() const;
@@ -89,6 +95,9 @@ public:
 
         if (!date.empty())
             ss << "Date: " << date << "\n";
+
+        if (assignedProsecutor)
+            ss << "Assigned Prosecutor: " << assignedProsecutor->getName() << " (ID: " << assignedProsecutor->getId() << ")\n";
 
         return ss.str();
     }
@@ -300,6 +309,10 @@ public:
     void addCase(Case* c);
     void addCase(int id, string type);  // Simpler version
     void addCase(int id, string type, double extraInfo);  // Version with extra info
+
+    // New function to handle Prosecutor assignment
+    void assignProsecutorToCase(Case* c);
+    void reassignProsecutorToCase(int caseId);
 
     Location* addLocation(const string& address, const string& city, const string& state, const string& zipCode = "");
     void listCases();

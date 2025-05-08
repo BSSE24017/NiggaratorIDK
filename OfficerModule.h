@@ -13,7 +13,7 @@ using namespace std;
 // Forward declarations
 class SHO;
 class CO;
-class ASI;
+class Prosecutor;
 class HeadConstable;
 class Constable;
 
@@ -90,11 +90,11 @@ public:
     vector<string> getResponsibilities() const override;
 };
 
-class ASI : public Officer {
+class Prosecutor : public Officer {
 public:
-    ASI(string n = "", int i = -1) : Officer(n, i, "ASI") {}
+    Prosecutor(string n = "", int i = -1) : Officer(n, i, "Prosecutor") {}
     
-    string getRole() const override { return "ASI"; }
+    string getRole() const override { return "Prosecutor"; }
     void performDuty() const override;
     vector<string> getResponsibilities() const override;
 };
@@ -150,6 +150,9 @@ public:
 
     // Get all available constables
     vector<Constable> getAvailableConstables() const;
+
+    // Get all prosecutors
+    vector<Prosecutor*> getProsecutors() const;
 
     // Public getter for officerMap
     const map<int, Officer*>& getOfficerMap() const { return officerMap; }

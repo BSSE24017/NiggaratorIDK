@@ -6,6 +6,12 @@
 #include "JailModule.h"
 
 int main() {
+    // Load all data at startup
+    OfficerRegistry::getInstance()->getManager().load();
+    CrimeRegistry::getInstance()->getManager().load();
+    FleetRegistry::getInstance()->getFleet().loadVehiclesFromFile("vehicles.json");
+    FleetRegistry::getInstance()->getFleet().loadPatrolsFromFile("patrolling.json");
+
     int choice;
     do {
         std::cout << "\n=== Law Enforcement Management System ===\n";

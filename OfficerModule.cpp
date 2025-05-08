@@ -17,8 +17,8 @@ Officer* Officer::fromJson(const json& j) {
         officer = new SHO(j["name"], j["id"]);
     } else if (role == "CO") {
         officer = new CO(j["name"], j["id"]);
-    } else if (role == "ASI") {
-        officer = new ASI(j["name"], j["id"]);
+    } else if (role == "Prosecutor" || role == "ASI") {  // Handle both new and old role names
+        officer = new Prosecutor(j["name"], j["id"]);
     } else if (role == "Head Constable") {
         officer = new HeadConstable(j["name"], j["id"]);
     } else if (role == "Constable") {
@@ -40,10 +40,12 @@ void SHO::performDuty() const {
 
 vector<string> SHO::getResponsibilities() const {
     return {
-        "Manage police station operations",
-        "Supervise all officers",
-        "Handle major cases",
-        "Coordinate with higher authorities"
+        "Pretends to be too busy for anything unless it involves a politician or the media.",
+        "Runs the police station like it's a government version of a startup—chaotic, underfunded, and somehow still standing.",
+        "Approves everything, signs everything, but rarely does anything.",
+        "Expert in meetings, paperwork shuffling, and giving long-winded motivational speeches that confuse everyone.",
+        "Has a mysterious sixth sense for showing up exactly when chai arrives.",
+        "\"Knows every rule in the book… mostly to bend it without breaking it.\"",
     };
 }
 
@@ -54,24 +56,28 @@ void CO::performDuty() const {
 
 vector<string> CO::getResponsibilities() const {
     return {
-        "Manage police circle operations",
-        "Supervise multiple police stations",
-        "Handle administrative matters",
-        "Coordinate with district authorities"
+        "Literally holds the keys to everyone's freedom… and uses them sparingly.",
+        "Babysits the criminals, deals with hunger tantrums and toilet emergencies.",
+        "Gets blamed for every breakout, even if the criminal was a magician.",
+        "Knows every inmate's favorite food, story, and complaint.",
+        "Has mastered the art of saying: \"Sit down and shut up\" in 17 tones.",
+        "\"Not a jailer. More like a very strict, underpaid hotel manager.\"",
     };
 }
 
-// ASI implementations
-void ASI::performDuty() const {
-    cout << "Assistant Sub-Inspector " << name << " is handling investigations.\n";
+// Prosecutor implementations
+void Prosecutor::performDuty() const {
+    cout << "Prosecutor " << name << " is handling investigations.\n";
 }
 
-vector<string> ASI::getResponsibilities() const {
+vector<string> Prosecutor::getResponsibilities() const {
     return {
-        "Conduct investigations",
-        "Supervise constables",
-        "Handle case documentation",
-        "Assist SHO in station management"
+        "Speak Latin phrases to sound smarter than everyone else.",
+        "Fluent in Legalese, Gibberish, and Passive Aggression.",
+        "Make sure that even the most obvious criminals have a \"fair chance to walk free.\"",
+        "Experts at objection, rejection, and redirection.",
+        "Prepare case files like they're crafting epic novels—with plot twists and plot holes.",
+        "\"More dramatic than courtroom TV. Less justice, more just… this.\"",
     };
 }
 
@@ -96,10 +102,15 @@ void Constable::performDuty() const {
 
 vector<string> Constable::getResponsibilities() const {
     return {
-        "Perform routine police work",
-        "Maintain law and order",
-        "Assist in investigations",
-        "Handle public interactions"
+        "Practice my 'stern but approachable' face in the mirror",
+        "Perfect the skill of writing parking tickets while maintaining eye contact",
+        "Develop an encyclopedic knowledge of local coffee shops (for 'patrol purposes')",
+        "Does everything nobody else wants to: from chasing thieves to catching dogs.",
+        "Gets yelled at by seniors, public, juniors, even pigeons if they could talk.",
+        "Expert in standing still for 8 hours straight during VIP duty.",
+        "Walks 10 km a day—inside the station.",
+        "Occasionally solves big cases, but the SHO takes credit and gives him chai.",
+        "\"First to arrive, last to leave, never to complain—except constantly.\"",
     };
 }
 
@@ -194,6 +205,7 @@ void OfficerManager::save() {
 
 void OfficerManager::load() {
     loadFromJson("officers.json");
+    cout << "Loaded " << officers.size() << " officers from file." << endl;
 }
 
 OfficerRegistry* OfficerRegistry::getInstance() {
@@ -309,8 +321,8 @@ void officerMenu() {
                 
                 cout << "Select rank:\n";
                 cout << "1. SHO (Station House Officer)\n";
-                cout << "2. CO (Circle Officer)\n";
-                cout << "3. ASI (Assistant Sub-Inspector)\n";
+                cout << "2. CO (Correctional/Cells Officer)\n";
+                cout << "3. Prosecutor\n";
                 cout << "4. Head Constable\n";
                 cout << "5. Constable\n";
                 cout << "Enter choice (1-5): ";
@@ -322,7 +334,7 @@ void officerMenu() {
                 switch (rankChoice) {
                     case 1: officer = new SHO(name); break;
                     case 2: officer = new CO(name); break;
-                    case 3: officer = new ASI(name); break;
+                    case 3: officer = new Prosecutor(name); break;
                     case 4: officer = new HeadConstable(name); break;
                     case 5: officer = new Constable(name); break;
                 }
@@ -381,6 +393,17 @@ vector<Constable> OfficerManager::getAvailableConstables() const {
             if (!c->isAssigned()) {
                 result.push_back(*c);
             }
+        }
+    }
+    return result;
+}
+
+//the vector to go for prosecutors in case assign
+vector<Prosecutor*> OfficerManager::getProsecutors() const {
+    vector<Prosecutor*> result;
+    for (const auto* officer : officers) {
+        if (officer->getRole() == "Prosecutor") {
+            result.push_back(const_cast<Prosecutor*>(static_cast<const Prosecutor*>(officer)));
         }
     }
     return result;

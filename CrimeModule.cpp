@@ -9,98 +9,110 @@ using namespace std;
 CrimeRegistry* CrimeRegistry::instance = nullptr;
 
 void Case::displayDetails() const {
-    cout << "Case Type: " << type << ", ID: " << caseId << ", Severity: " << severity;
+    cout << "\nCase Type: " << type << ", ID: " << caseId << ", Severity: " << severity << endl;
     if (!date.empty()) {
-        cout << ", Date: " << date;
+        cout << "Date: " << date << endl;
     }
     if (!reportedBy.empty()) {
-        cout << ", Reported by: " << reportedBy;
+        cout << "Reported by: " << reportedBy << endl;
     }
     if (location) {
-        cout << ", " << *location;
+        cout << "Location: " << *location << endl;
     }
-    cout << endl;
+    if (assignedProsecutor) {
+        cout << "Assigned Prosecutor: " << assignedProsecutor->getName() << " (ID: " << assignedProsecutor->getId() << ")" << endl;
+    }
     if (!description.empty()) {
-        cout << "  Description: " << description << endl;
+        cout << "Description: " << description << endl;
     }
+    cout << "----------------------------------------" << endl;
 }
 
 void Theft::displayDetails() const {
-    cout << "Theft Case - ID: " << caseId
-        << ", Stolen Value: $" << stolenValue
-        << ", Severity: " << severity;
+    cout << "\nTheft Case - ID: " << caseId << endl;
+    cout << "Stolen Value: $" << stolenValue << endl;
+    cout << "Severity: " << severity << endl;
 
     if (!date.empty()) {
-        cout << ", Date: " << date;
+        cout << "Date: " << date << endl;
     }
     if (!reportedBy.empty()) {
-        cout << ", Reported by: " << reportedBy;
+        cout << "Reported by: " << reportedBy << endl;
     }
     if (!itemStolen.empty()) {
-        cout << ", Item: " << itemStolen;
+        cout << "Item: " << itemStolen << endl;
     }
-    cout << ", Recovered: " << (recovered ? "Yes" : "No");
+    cout << "Recovered: " << (recovered ? "Yes" : "No") << endl;
 
     if (location) {
-        cout << ", " << *location;
+        cout << "Location: " << *location << endl;
     }
-    cout << endl;
+    if (assignedProsecutor) {
+        cout << "Assigned Prosecutor: " << assignedProsecutor->getName() << " (ID: " << assignedProsecutor->getId() << ")" << endl;
+    }
     if (!description.empty()) {
-        cout << "  Description: " << description << endl;
+        cout << "Description: " << description << endl;
     }
+    cout << "----------------------------------------" << endl;
 }
 
 void Assault::displayDetails() const {
-    cout << "Assault Case - ID: " << caseId
-        << ", Weapon Used: " << (weaponUsed ? "Yes" : "No")
-        << ", Severity: " << severity;
+    cout << "\nAssault Case - ID: " << caseId << endl;
+    cout << "Weapon Used: " << (weaponUsed ? "Yes" : "No") << endl;
+    cout << "Severity: " << severity << endl;
 
     if (!date.empty()) {
-        cout << ", Date: " << date;
+        cout << "Date: " << date << endl;
     }
     if (!reportedBy.empty()) {
-        cout << ", Reported by: " << reportedBy;
+        cout << "Reported by: " << reportedBy << endl;
     }
     if (!victimName.empty()) {
-        cout << ", Victim: " << victimName;
+        cout << "Victim: " << victimName << endl;
     }
     if (injurySeverity > 0) {
-        cout << ", Injury Severity: " << injurySeverity;
+        cout << "Injury Severity: " << injurySeverity << endl;
     }
 
     if (location) {
-        cout << ", " << *location;
+        cout << "Location: " << *location << endl;
     }
-    cout << endl;
+    if (assignedProsecutor) {
+        cout << "Assigned Prosecutor: " << assignedProsecutor->getName() << " (ID: " << assignedProsecutor->getId() << ")" << endl;
+    }
     if (!description.empty()) {
-        cout << "  Description: " << description << endl;
+        cout << "Description: " << description << endl;
     }
+    cout << "----------------------------------------" << endl;
 }
 
 // Implementation for Vandalism display
 void Vandalism::displayDetails() const {
-    cout << "Vandalism Case - ID: " << caseId
-        << ", Damage Value: $" << damageValue
-        << ", Public Property: " << (publicProperty ? "Yes" : "No")
-        << ", Severity: " << severity;
+    cout << "\nVandalism Case - ID: " << caseId << endl;
+    cout << "Damage Value: $" << damageValue << endl;
+    cout << "Public Property: " << (publicProperty ? "Yes" : "No") << endl;
+    cout << "Severity: " << severity << endl;
 
     if (!date.empty()) {
-        cout << ", Date: " << date;
+        cout << "Date: " << date << endl;
     }
     if (!reportedBy.empty()) {
-        cout << ", Reported by: " << reportedBy;
+        cout << "Reported by: " << reportedBy << endl;
     }
     if (!propertyType.empty()) {
-        cout << ", Property Type: " << propertyType;
+        cout << "Property Type: " << propertyType << endl;
     }
 
     if (location) {
-        cout << ", " << *location;
+        cout << "Location: " << *location << endl;
     }
-    cout << endl;
+    if (assignedProsecutor) {
+        cout << "Assigned Prosecutor: " << assignedProsecutor->getName() << " (ID: " << assignedProsecutor->getId() << ")" << endl;
+    }
     if (!description.empty()) {
-        cout << "  Description: " << description << endl;
+        cout << "Description: " << description << endl;
     }
+    cout << "----------------------------------------" << endl;
 }
 
 void CrimeManager::addCase(Case* c) {
@@ -228,6 +240,15 @@ void CrimeManager::save() {
         }
         if (!c->getDate().empty()) {
             caseJson["date"] = c->getDate();
+        }
+
+        // Add Prosecutor information if assigned
+        if (c->getAssignedProsecutor()) {
+            caseJson["assignedProsecutor"] = {
+                {"id", c->getAssignedProsecutor()->getId()},
+                {"name", c->getAssignedProsecutor()->getName()},
+                {"rank", c->getAssignedProsecutor()->getRank()}
+            };
         }
 
         // Add location information if available
@@ -381,6 +402,20 @@ void CrimeManager::load() {
             }
             if (caseJson.contains("date")) {
                 newCase->setDate(caseJson["date"]);
+            }
+
+            // Restore Prosecutor
+            if (caseJson.contains("assignedProsecutor")) {
+                auto& officerManager = OfficerRegistry::getInstance()->getManager();
+                int prosecutorId = caseJson["assignedProsecutor"]["id"];
+                auto& officerMap = officerManager.getOfficerMap();
+                auto it = officerMap.find(prosecutorId);
+                if (it != officerMap.end()) {
+                    Prosecutor* prosecutor = dynamic_cast<Prosecutor*>(it->second);
+                    if (prosecutor) {
+                        newCase->setAssignedProsecutor(prosecutor);
+                    }
+                }
             }
 
             // Check if location data exists
@@ -684,6 +719,59 @@ void CrimeManager::filterCasesByLocation(const string& city) {
     }
 }
 
+void CrimeManager::assignProsecutorToCase(Case* c) {
+    auto& officerManager = OfficerRegistry::getInstance()->getManager();
+    vector<Prosecutor*> availableProsecutors = officerManager.getProsecutors();
+    
+    if (!availableProsecutors.empty()) {
+        cout << "\nAvailable Prosecutors:\n";
+        for (int i = 0; i < availableProsecutors.size(); ++i) {
+            cout << i + 1 << ". " << availableProsecutors[i]->getName() 
+                 << " (ID: " << availableProsecutors[i]->getId() << ")\n";
+        }
+        
+        cout << "Select Prosecutor to assign (enter number): ";
+        int prosecutorChoice;
+        cin >> prosecutorChoice;
+        
+        if (prosecutorChoice > 0 && prosecutorChoice <= static_cast<int>(availableProsecutors.size())) {
+            c->setAssignedProsecutor(availableProsecutors[prosecutorChoice - 1]);
+            cout << "Prosecutor " << availableProsecutors[prosecutorChoice - 1]->getName() 
+                 << " assigned to the case.\n";
+        } else {
+            cout << "Invalid selection. No Prosecutor assigned.\n";
+        }
+    } else {
+        cout << "No Prosecutors available for assignment.\n";
+    }
+}
+
+void CrimeManager::reassignProsecutorToCase(int caseId) {
+    Case* c = findCase(caseId);
+    if (!c) {
+        cout << "Case not found with ID: " << caseId << endl;
+        return;
+    }
+
+    cout << "\nCurrent case details:\n";
+    c->displayDetails();
+
+    if (c->getAssignedProsecutor()) {
+        cout << "\nCurrently assigned Prosecutor: " << c->getAssignedProsecutor()->getName() 
+             << " (ID: " << c->getAssignedProsecutor()->getId() << ")" << endl;
+        
+        char choice;
+        cout << "Do you want to reassign this case? (y/n): ";
+        cin >> choice;
+        if (choice != 'y' && choice != 'Y') {
+            cout << "Prosecutor assignment unchanged.\n";
+            return;
+        }
+    }
+
+    assignProsecutorToCase(c);
+}
+
 CrimeRegistry* CrimeRegistry::getInstance() {
     if (!instance) instance = new CrimeRegistry();
     return instance;
@@ -708,7 +796,8 @@ void crimeMenu() {
         cout << "9. Update Case Details\n";
         cout << "10. Generate Statistics\n";
         cout << "11. Delete Case\n";
-        cout << "12. Save\n";
+        cout << "12. Assign/Reassign Prosecutor\n";
+        cout << "13. Save\n";
         cout << "0. Exit\n";
         cout << "Choice: ";
         cin >> choice;
@@ -764,6 +853,7 @@ void crimeMenu() {
                 theft->setDate(date);
 
                 mgr.addCase(theft);
+                mgr.assignProsecutorToCase(theft);
             }
             else if (type == "Assault") {
                 char weapon;
@@ -799,7 +889,9 @@ void crimeMenu() {
                 getline(cin, date);
                 assault->setDate(date);
 
+                // Assign Prosecutor
                 mgr.addCase(assault);
+                mgr.assignProsecutorToCase(assault);
             }
             else if (type == "Vandalism") {
                 double damageValue;
@@ -836,6 +928,7 @@ void crimeMenu() {
                 vandalism->setDate(date);
 
                 mgr.addCase(vandalism);
+                mgr.assignProsecutorToCase(vandalism);
             }
             else {
                 double severity;
@@ -860,6 +953,7 @@ void crimeMenu() {
                 generalCase->setDate(date);
 
                 mgr.addCase(generalCase);
+                mgr.assignProsecutorToCase(generalCase);
             }
             cout << "Case added successfully.\n";
             break;
@@ -963,7 +1057,14 @@ void crimeMenu() {
             }
             break;
         }
-        case 12: // Save
+        case 12: { // Assign/Reassign Prosecutor
+            int id;
+            cout << "Enter Case ID to assign/reassign Prosecutor: ";
+            cin >> id;
+            mgr.reassignProsecutorToCase(id);
+            break;
+        }
+        case 13: // Save
             mgr.save();
             cout << "All data saved.\n";
             break;
