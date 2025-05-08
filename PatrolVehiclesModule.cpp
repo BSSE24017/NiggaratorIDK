@@ -1,4 +1,4 @@
-/*#include "PatrolVehiclesModule.h"
+#include "PatrolVehiclesModule.h"
 
 int Vehicle::nextId = 1;
 int PatrolFleet::nextPatrolId = 1;
@@ -598,4 +598,4 @@ void patrolVehiclesMenu() {
             vehicleMenu(fleet);
         }
     } while (choice != 0);
-} */
+} 

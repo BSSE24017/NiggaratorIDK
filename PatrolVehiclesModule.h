@@ -1,4 +1,4 @@
-/*#pragma once
+#pragma once
 #include "ListTemplate.h"
 #include <string>
 #include <iostream>
@@ -165,4 +165,4 @@ public:
     PatrolFleet& getFleet();
 };
 
-void patrolVehiclesMenu(); */
+void patrolVehiclesMenu(); 
