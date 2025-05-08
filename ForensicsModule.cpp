@@ -1,169 +1,152 @@
 #include "ForensicsModule.h"
+#include <iomanip>
 
-ForensicLabRegistry* ForensicLabRegistry::instance = nullptr;
-
-ForensicExpert::ForensicExpert(string n, int id) : name(n), expertId(id) {}
-ForensicExpert::~ForensicExpert() {}
-int ForensicExpert::getId() const { return expertId; }
-string ForensicExpert::getName() const { return name; }
-bool ForensicExpert::operator==(const ForensicExpert& other) const { return expertId == other.expertId; }
-
-ostream& operator<<(ostream& os, const ForensicExpert& f) {
-    os << f.name << " (ID: " << f.expertId << ")";
-    return os;
-}
-
-LabTechnician::LabTechnician(string n, int id) : ForensicExpert(n, id) {}
-string LabTechnician::getSpecialty() const { return "Lab Technician"; }
-
-FieldAgent::FieldAgent(string n, int id) : ForensicExpert(n, id) {}
-string FieldAgent::getSpecialty() const { return "Field Agent"; }
-
-Evidence::Evidence(int id, string desc, string stat)
-    : evidenceId(id), description(desc), status(stat) {}
-
-int Evidence::getId() const { return evidenceId; }
-string Evidence::getDescription() const { return description; }
-string Evidence::getStatus() const { return status; }
-void Evidence::setStatus(const string& newStatus) { status = newStatus; }
-
-ostream& operator<<(ostream& os, const Evidence& e) {
-    os << "Evidence ID: " << e.evidenceId << ", Description: " << e.description << ", Status: " << e.status;
-    return os;
-}
-
+// --------- Lab Functions ---------
 void ForensicLab::addLabTech(const LabTechnician& e) {
     labTechs.add(e);
-    expertMap[e.getId()] = nullptr;
+    cout << "Lab Tech '" << e.getName() << "' added! Let's hope they don’t mix up the test tubes again.\n";
 }
 
 void ForensicLab::addFieldAgent(const FieldAgent& e) {
     fieldAgents.add(e);
-    expertMap[e.getId()] = nullptr;
-}
-
-void ForensicLab::addLabTech(const string& name, int id) {
-    addLabTech(LabTechnician(name, id));
+    cout << "Field Agent '" << e.getName() << "' enlisted. Time to grab those cool shades and chase clues!\n";
 }
 
 void ForensicLab::listExperts() {
+    cout << "\n--- List of Experts ---\n";
     cout << "Lab Technicians:\n";
-    for (int i = 0; i < labTechs.size(); ++i)
-        cout << labTechs[i] << " - " << labTechs[i].getSpecialty() << "\n";
+    for (const auto& lt : labTechs)
+        cout << "- " << lt << " [" << lt.getSpecialty() << "]\n";
 
     cout << "Field Agents:\n";
-    for (int i = 0; i < fieldAgents.size(); ++i)
-        cout << fieldAgents[i] << " - " << fieldAgents[i].getSpecialty() << "\n";
+    for (const auto& fa : fieldAgents)
+        cout << "- " << fa << " [" << fa.getSpecialty() << "]\n";
 }
 
-void ForensicLab::assignEvidence(int techId, const Evidence& ev) {
-    assignedEvidence[techId].push_back(ev);
-    cout << "Evidence assigned to Technician #" << techId << ". Hope they know what they’re doing.\n";
-}
-
-void ForensicLab::viewEvidence(int techId) {
-    if (assignedEvidence.count(techId) == 0 || assignedEvidence[techId].empty()) {
-        cout << "No evidence assigned to Technician #" << techId << ". They might be napping.\n";
-        return;
+// --------- Evidence Handling ---------
+void ForensicLab::assignEvidence(int techId, int caseId, const string& desc) {
+    for (size_t i = 0; i < labTechs.size(); ++i) {
+        if (labTechs[i].getId() == techId) {
+            int evidenceId = evidences.size() + 1;
+            evidences.add(Evidence(evidenceId, desc, false, caseId));
+            cout << "Evidence assigned to Lab Tech #" << techId << ". Don't spill it!\n";
+            return;
+        }
     }
+    cout << "Oops! Lab Technician with ID #" << techId << " not found.\n";
+}
 
-    cout << "Evidence assigned to Technician #" << techId << ":\n";
-    for (const auto& e : assignedEvidence[techId]) {
+void ForensicLab::markEvidenceProcessed(int evId) {
+    for (size_t i = 0; i < evidences.size(); ++i) {
+        if (evidences[i].getId() == evId) {
+            evidences[i].markProcessed();
+            cout << "Evidence #" << evId << " marked as processed. Lab smells a bit funky now.\n";
+            return;
+        }
+    }
+    cout << "Evidence ID not found!\n";
+}
+
+void ForensicLab::listAllEvidence() {
+    cout << "\n--- All Evidence ---\n";
+    for (const auto& e : evidences)
         cout << e << "\n";
-    }
 }
 
-void ForensicLab::removeExpert(int id) {
-    bool removed = false;
-    for (int i = 0; i < labTechs.size(); ++i) {
-        if (labTechs[i].getId() == id) {
-            labTechs.removeAt(i);
-            removed = true;
-            break;
-        }
-    }
-
-    for (int i = 0; i < fieldAgents.size(); ++i) {
-        if (fieldAgents[i].getId() == id) {
-            fieldAgents.removeAt(i);
-            removed = true;
-            break;
-        }
-    }
-
-    expertMap.erase(id);
-    assignedEvidence.erase(id);
-
-    if (removed)
-        cout << "Expert removed. Let’s hope they weren’t on a breakthrough.\n";
-    else
-        cout << "No expert found with that ID.\n";
+// --------- Case Handling ---------
+void ForensicLab::addCase(int caseId, const string& title) {
+    caseFiles.add(CaseFile(caseId, title));
+    cout << "Case #" << caseId << " added. Time to dig into the mystery!\n";
 }
 
+void ForensicLab::editCase(int caseId, const string& newTitle) {
+    for (size_t i = 0; i < caseFiles.size(); ++i) {
+        if (caseFiles[i].getId() == caseId) {
+            caseFiles[i].setTitle(newTitle);
+            cout << "Case #" << caseId << " title updated to '" << newTitle << "'. Sherlock would approve!\n";
+            return;
+        }
+    }
+    cout << "Case not found!\n";
+}
+
+void ForensicLab::checkCaseProgress(int caseId) {
+    for (const auto& c : caseFiles) {
+        if (c.getId() == caseId) {
+            cout << "Case #" << caseId << " is currently [" << c.getStatus() << "]\n";
+            return;
+        }
+    }
+    cout << "No such case found.\n";
+}
+
+void ForensicLab::markCaseResolved(int caseId) {
+    for (size_t i = 0; i < caseFiles.size(); ++i) {
+        if (caseFiles[i].getId() == caseId) {
+            caseFiles[i].setStatus("Resolved");
+            cout << "Case #" << caseId << " has been resolved. Confetti incoming!\n";
+            return;
+        }
+    }
+    cout << "No case found.\n";
+}
+
+void ForensicLab::listAllCases() {
+    cout << "\n--- All Cases ---\n";
+    for (const auto& c : caseFiles)
+        cout << c << "\n";
+}
+
+// --------- Save & Load ---------
 void ForensicLab::save() {
-    json j;
-    j["lab_technicians"] = json::array();
-    j["field_agents"] = json::array();
-    j["assigned_evidence"] = json::object();
-
-    for (int i = 0; i < labTechs.size(); ++i) {
-        auto& e = labTechs[i];
-        j["lab_technicians"].push_back({ {"id", e.getId()}, {"name", e.getName()} });
+    json data;
+    for (const auto& ev : evidences) {
+        data["evidences"].push_back({
+            {"id", ev.getId()},
+            {"desc", ev.getDescription()},
+            {"status", ev.getStatus()},
+            {"case", ev.getCaseId()}
+        });
     }
 
-    for (int i = 0; i < fieldAgents.size(); ++i) {
-        auto& e = fieldAgents[i];
-        j["field_agents"].push_back({ {"id", e.getId()}, {"name", e.getName()} });
+    for (const auto& c : caseFiles) {
+        data["cases"].push_back({
+            {"id", c.getId()},
+            {"title", c.getTitle()},
+            {"status", c.getStatus()}
+        });
     }
 
-    for (auto& pair : assignedEvidence) {
-        vector<json> evidenceList;
-        for (const auto& ev : pair.second) {
-            evidenceList.push_back({ {"id", ev.getId()}, {"desc", ev.getDescription()}, {"status", ev.getStatus()} });
-        }
-        j["assigned_evidence"][to_string(pair.first)] = evidenceList;
-    }
-
-    ofstream file("data/forensics.json");
-    file << j.dump(4);
+    ofstream file("forensics_data.json");
+    file << setw(4) << data;
+    file.close();
+    cout << "Data saved. Hope no one hacks us now!\n";
 }
 
 void ForensicLab::load() {
-    labTechs.clear();
-    fieldAgents.clear();
-    expertMap.clear();
-    assignedEvidence.clear();
-
-    ifstream file("data/forensics.json");
-    if (!file.is_open()) return;
-
-    json j;
-    file >> j;
-
-    for (auto& item : j["lab_technicians"]) {
-        int id = item["id"];
-        string name = item["name"];
-        addLabTech(LabTechnician(name, id));
+    ifstream file("forensics_data.json");
+    if (!file.is_open()) {
+        cout << "No saved file found. Starting fresh like a new crime scene.\n";
+        return;
     }
 
-    for (auto& item : j["field_agents"]) {
-        int id = item["id"];
-        string name = item["name"];
-        addFieldAgent(FieldAgent(name, id));
-    }
+    json data;
+    file >> data;
 
-    for (auto& pair : j["assigned_evidence"].items()) {
-        int techId = stoi(pair.key());
-        for (auto& evJson : pair.value()) {
-            int id = evJson["id"];
-            string desc = evJson["desc"];
-            string stat = evJson["status"];
-            assignEvidence(techId, Evidence(id, desc, stat));
-        }
-    }
+    evidences.clear();
+    for (const auto& e : data["evidences"])
+        evidences.add(Evidence(e["id"], e["desc"], e["status"], e["case"]));
+
+    caseFiles.clear();
+    for (const auto& c : data["cases"])
+        caseFiles.add(CaseFile(c["id"], c["title"], c["status"]));
+
+    file.close();
+    cout << "Data loaded. Welcome back, detective!\n";
 }
 
-ForensicLabRegistry::ForensicLabRegistry() {}
+// --------- Singleton Access ---------
+ForensicLabRegistry* ForensicLabRegistry::instance = nullptr;
 
 ForensicLabRegistry* ForensicLabRegistry::getInstance() {
     if (!instance)
@@ -175,64 +158,125 @@ ForensicLab& ForensicLabRegistry::getLab() {
     return lab;
 }
 
+// --------- Menu ---------
 void forensicsMenu() {
     ForensicLab& lab = ForensicLabRegistry::getInstance()->getLab();
     lab.load();
-    int choice;
 
+    int choice;
     do {
-        cout << "\n--- Forensics Management Menu ---\n";
+        cout << "\n======= FORENSICS MODULE =======\n";
         cout << "1. Add Lab Technician\n";
         cout << "2. Add Field Agent\n";
-        cout << "3. List All Experts\n";
-        cout << "4. Assign Evidence to Technician\n";
-        cout << "5. View Evidence Assigned to Technician\n";
-        cout << "6. Remove an Expert\n";
-        cout << "7. Save\n";
-        cout << "0. Exit\n";
+        cout << "3. List Experts\n";
+        cout << "4. Add Case File\n";
+        cout << "5. Edit Case Title\n";
+        cout << "6. Check Case Progress\n";
+        cout << "7. Mark Case as Resolved\n";
+        cout << "8. List All Cases\n";
+        cout << "9. Assign Evidence to Lab Tech\n";
+        cout << "10. Mark Evidence Processed\n";
+        cout << "11. List All Evidence\n";
+        cout << "0. Save & Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
-        if (choice == 1 || choice == 2) {
-            string name;
-            int id;
-            cout << "Enter ID: "; cin >> id;
-            cout << "Enter Name: "; cin.ignore(); getline(cin, name);
-            if (choice == 1)
-                lab.addLabTech(name, id);
-            else
-                lab.addFieldAgent(FieldAgent(name, id));
+        switch (choice) {
+            case 1: {
+                string name;
+                int id;
+                cout << "Enter name: ";
+                cin.ignore();
+                getline(cin, name);
+                cout << "Enter ID: ";
+                cin >> id;
+                lab.addLabTech(LabTechnician(name, id));
+                break;
+            }
+            case 2: {
+                string name;
+                int id, caseId;
+                cout << "Enter name: ";
+                cin.ignore();
+                getline(cin, name);
+                cout << "Enter ID: ";
+                cin >> id;
+                cout << "Assign to Case ID: ";
+                cin >> caseId;
+                lab.addFieldAgent(FieldAgent(name, id, caseId));
+                break;
+            }
+            case 3:
+                lab.listExperts();
+                break;
+            case 4: {
+                int id;
+                string title;
+                cout << "Enter Case ID: ";
+                cin >> id;
+                cin.ignore();
+                cout << "Enter Title: ";
+                getline(cin, title);
+                lab.addCase(id, title);
+                break;
+            }
+            case 5: {
+                int id;
+                string title;
+                cout << "Enter Case ID: ";
+                cin >> id;
+                cin.ignore();
+                cout << "Enter new title: ";
+                getline(cin, title);
+                lab.editCase(id, title);
+                break;
+            }
+            case 6: {
+                int id;
+                cout << "Enter Case ID: ";
+                cin >> id;
+                lab.checkCaseProgress(id);
+                break;
+            }
+            case 7: {
+                int id;
+                cout << "Enter Case ID to mark resolved: ";
+                cin >> id;
+                lab.markCaseResolved(id);
+                break;
+            }
+            case 8:
+                lab.listAllCases();
+                break;
+            case 9: {
+                int techId, caseId;
+                string desc;
+                cout << "Enter Lab Tech ID: ";
+                cin >> techId;
+                cout << "Enter Case ID: ";
+                cin >> caseId;
+                cin.ignore();
+                cout << "Enter Evidence Description: ";
+                getline(cin, desc);
+                lab.assignEvidence(techId, caseId, desc);
+                break;
+            }
+            case 10: {
+                int evId;
+                cout << "Enter Evidence ID to mark processed: ";
+                cin >> evId;
+                lab.markEvidenceProcessed(evId);
+                break;
+            }
+            case 11:
+                lab.listAllEvidence();
+                break;
+            case 0:
+                lab.save();
+                cout << "Exiting Forensics Module... Don’t forget your magnifying glass!\n";
+                break;
+            default:
+                cout << "Invalid choice. Try again with less caffeine.\n";
         }
-        else if (choice == 3) {
-            lab.listExperts();
-        }
-        else if (choice == 4) {
-            int techId, evidenceId;
-            string desc;
-            cout << "Enter Technician ID: "; cin >> techId;
-            cout << "Enter Evidence ID: "; cin >> evidenceId;
-            cout << "Enter Description: "; cin.ignore(); getline(cin, desc);
-            lab.assignEvidence(techId, Evidence(evidenceId, desc));
-        }
-        else if (choice == 5) {
-            int techId;
-            cout << "Enter Technician ID: ";
-            cin >> techId;
-            lab.viewEvidence(techId);
-        }
-        else if (choice == 6) {
-            int id;
-            cout << "Enter Expert ID to remove: ";
-            cin >> id;
-            lab.removeExpert(id);
-        }
-        else if (choice == 7) {
-            lab.save();
-            cout << "Data saved successfully.\n";
-        }
-
     } while (choice != 0);
-
-    lab.save();
-    cout << "Exiting Forensics Module. Don't forget to clean your lab station.\n";
 }
