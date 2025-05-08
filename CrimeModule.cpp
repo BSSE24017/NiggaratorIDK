@@ -1,8 +1,37 @@
 #include "CrimeModule.h"
 #include <algorithm> // Added for std::sort
+#include <fstream>
+using json = nlohmann::json;
+
 using namespace std;
 
 CrimeRegistry* CrimeRegistry::instance = nullptr;
+
+void Case::displayDetails() const {
+	cout << "Case Type: " << type << ", ID: " << caseId << ", Severity: " << severity;
+	if (location) {
+		cout << ", " << *location;
+	}
+	cout << endl;
+}
+
+void Theft::displayDetails() const {
+	cout << "Theft Case - ID: " << caseId << ", Stolen Value: $" << stolenValue << ", Severity: " << severity;
+	if (location) {
+		cout << ", " << *location;
+	}
+	cout << endl;
+}
+
+void Assault::displayDetails() const {
+	cout << "Assault Case - ID: " << caseId
+		<< ", Weapon Used: " << (weaponUsed ? "Yes" : "No")
+		<< ", Severity: " << severity;
+	if (location) {
+		cout << ", " << *location;
+	}
+	cout << endl;
+}
 
 void CrimeManager::addCase(Case* c) {
 	cases.add(c);
@@ -35,6 +64,13 @@ void CrimeManager::addCase(int id, string type, double extraInfo) {
 		newCase = new Case(type, id, extraInfo);  // extraInfo is severity
 
 	addCase(newCase);
+}
+
+// Location methods (aggregation)
+Location* CrimeManager::addLocation(const string& address, const string& city, const string& state) {
+	Location* loc = new Location(address, city, state);
+	locations.add(loc);
+	return loc;
 }
 
 Case* CrimeManager::findCase(int id) {
@@ -73,25 +109,46 @@ void CrimeManager::listCasesByPriority() {
 }
 
 void CrimeManager::save() {
-	std::ofstream file("data/crimes.txt");
-	for (auto& c : cases) {
-		file << c->getId() << "," << c->getType();
+	// Create a JSON array to store cases
+	json casesJson = json::array();
 
-		// Add extra information based on case type
+	for (auto& c : cases) {
+		// Create a JSON object for each case
+		json caseJson;
+		caseJson["id"] = c->getId();
+		caseJson["type"] = c->getType();
+		caseJson["severity"] = c->getSeverity();
+
+		// Add location information if available
+		if (c->getLocation()) {
+			caseJson["location"] = {
+				{"address", c->getLocation()->getAddress()},
+				{"city", c->getLocation()->getCity()},
+				{"state", c->getLocation()->getState()}
+			};
+		}
+
+		// Add type-specific information
 		if (c->getType() == "Theft") {
 			Theft* theft = dynamic_cast<Theft*>(c);
 			if (theft) {
-				file << "," << theft->getStolenValue();
+				caseJson["stolenValue"] = theft->getStolenValue();
 			}
 		}
 		else if (c->getType() == "Assault") {
 			Assault* assault = dynamic_cast<Assault*>(c);
 			if (assault) {
-				file << "," << (assault->wasWeaponUsed() ? "1" : "0");
+				caseJson["weaponUsed"] = assault->wasWeaponUsed();
 			}
 		}
-		file << "\n";
+
+		// Add this case to the array
+		casesJson.push_back(caseJson);
 	}
+
+	// Write JSON to file
+	ofstream file("crimes.json");
+	file << casesJson.dump(4); // Indent with 4 spaces for better readability
 	file.close();
 }
 
@@ -103,34 +160,68 @@ void CrimeManager::load() {
 	cases.clear();
 	caseMap.clear();
 
-	ifstream file("data/crimes.txt");
-	string line;
-	while (getline(file, line)) {
-		int id;
-		string type;
-		size_t pos = line.find(',');
-		if (pos == string::npos) continue;
-
-		id = stoi(line.substr(0, pos));
-		string remainder = line.substr(pos + 1);
-
-		pos = remainder.find(',');
-		if (pos == string::npos) {
-			// Simple case with no extra info
-			type = remainder;
-			addCase(id, type);
-		}
-		else {
-			// Case with extra info
-			type = remainder.substr(0, pos);
-			double extraInfo = stod(remainder.substr(pos + 1));
-
-			addCase(id, type, extraInfo);
-		}
+	// Clean up locations
+	for (auto& loc : locations) {
+		delete loc;
 	}
-	file.close();
-}
+	locations.clear();
 
+	try {
+		// Open and read the JSON file
+		ifstream file("crimes.json");
+		if (!file.is_open()) {
+			cout << "No saved data found or could not open file." << endl;
+			return;
+		}
+
+		json casesJson;
+		file >> casesJson;
+		file.close();
+
+		// Process each case in the JSON array
+		for (const auto& caseJson : casesJson) {
+			int id = caseJson["id"];
+			string type = caseJson["type"];
+
+			Case* newCase = nullptr;
+
+			// Create the appropriate case type
+			if (type == "Theft") {
+				double stolenValue = caseJson.contains("stolenValue") ? caseJson["stolenValue"].get<double>() : 0.0;
+				Theft* theft = new Theft(id, stolenValue);
+				theft->setSeverity(caseJson["severity"]);
+				newCase = theft;
+			}
+			else if (type == "Assault") {
+				bool weaponUsed = caseJson.contains("weaponUsed") ? caseJson["weaponUsed"].get<bool>() : false;
+				Assault* assault = new Assault(id, weaponUsed);
+				assault->setSeverity(caseJson["severity"]);
+				newCase = assault;
+			}
+			else {
+				newCase = new Case(type, id, caseJson["severity"]);
+			}
+
+			// Check if location data exists
+			if (caseJson.contains("location")) {
+				string address = caseJson["location"]["address"];
+				string city = caseJson["location"]["city"];
+				string state = caseJson["location"]["state"];
+
+				Location* loc = addLocation(address, city, state);
+				newCase->setLocation(loc);
+			}
+
+			// Add the case to our collections
+			addCase(newCase);
+		}
+
+		cout << "Loaded " << cases.size() << " cases from file." << endl;
+	}
+	catch (const exception& e) {
+		cout << "Error loading data: " << e.what() << endl;
+	}
+}
 CrimeRegistry* CrimeRegistry::getInstance() {
 	if (!instance) instance = new CrimeRegistry();
 	return instance;
@@ -149,6 +240,7 @@ void crimeMenu() {
 		cout << "3. List Cases By Priority\n";
 		cout << "4. Save\n";
 		cout << "5. Find Case\n";
+		cout << "6. Add Location to Case\n";
 		cout << "0. Back\n";
 		cout << "Choice: ";
 		cin >> choice;
@@ -180,7 +272,6 @@ void crimeMenu() {
 				cin >> severity;
 				mgr.addCase(id, type, severity);
 			}
-
 		}
 		else if (choice == 2) {
 			mgr.listCases();
@@ -201,6 +292,30 @@ void crimeMenu() {
 			if (found) {
 				cout << "Found case: ";
 				found->displayDetails();  // Polymorphic call
+			}
+			else {
+				cout << "Case not found.\n";
+			}
+		}
+		else if (choice == 6) {
+			int id;
+			string address, city, state;
+			cout << "Enter Case ID to add location: ";
+			cin >> id;
+
+			Case* found = mgr.findCase(id);
+			if (found) {
+				cin.ignore();
+				cout << "Enter address: ";
+				getline(cin, address);
+				cout << "Enter city: ";
+				getline(cin, city);
+				cout << "Enter state: ";
+				getline(cin, state);
+
+				Location* loc = mgr.addLocation(address, city, state);
+				found->setLocation(loc);
+				cout << "Location added to case.\n";
 			}
 			else {
 				cout << "Case not found.\n";
