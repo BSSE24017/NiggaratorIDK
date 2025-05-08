@@ -1,0 +1,17 @@
+{
+    "cases": [
+        {
+            "id": 2,
+            "status": "Resolved",
+            "title": "steve's murder"
+        }
+    ],
+    "evidences": [
+        {
+            "case": 2,
+            "desc": "murder weapon found under bed",
+            "id": 1,
+            "status": false
+        }
+    ]
+}

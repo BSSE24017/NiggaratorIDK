@@ -81,15 +81,30 @@ void ForensicLab::checkCaseProgress(int caseId) {
 }
 
 void ForensicLab::markCaseResolved(int caseId) {
+    bool found = false;
     for (size_t i = 0; i < caseFiles.size(); ++i) {
         if (caseFiles[i].getId() == caseId) {
             caseFiles[i].setStatus("Resolved");
-            cout << "Case #" << caseId << " has been resolved. Confetti incoming!\n";
-            return;
+            cout << "Case #" << caseId << " has been marked as resolved. 🎉 Justice served!" << endl;
+            found = true;
+
+            // Now mark all related evidence as processed
+            for (size_t j = 0; j < evidences.size(); ++j) {
+                if (evidences[j].getCaseId() == caseId && !evidences[j].getStatus()) {
+                    evidences[j].markProcessed();
+                    cout << "   > Evidence #" << evidences[j].getId() << " marked as processed." << endl;
+                }
+            }
+
+            break;
         }
     }
-    cout << "No case found.\n";
+
+    if (!found) {
+        cout << "Case ID not found. Either it's hiding... or it never existed!" << endl;
+    }
 }
+
 
 void ForensicLab::listAllCases() {
     cout << "\n--- All Cases ---\n";
