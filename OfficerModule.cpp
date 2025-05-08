@@ -370,4 +370,18 @@ void officerMenu() {
                 cout << "Invalid choice\n";
         }
     }
+}
+
+//the vector to go for patrols
+vector<Constable> OfficerManager::getAvailableConstables() const {
+    vector<Constable> result;
+    for (const auto* officer : officers) {
+        if (officer->getRole() == "Constable") {
+            const Constable* c = static_cast<const Constable*>(officer);
+            if (!c->isAssigned()) {
+                result.push_back(*c);
+            }
+        }
+    }
+    return result;
 } 

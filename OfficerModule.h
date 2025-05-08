@@ -109,12 +109,23 @@ public:
 };
 
 class Constable : public Officer {
+    bool assignedToPatrol = false;
 public:
     Constable(string n = "", int i = -1) : Officer(n, i, "Constable") {}
-    
     string getRole() const override { return "Constable"; }
     void performDuty() const override;
     vector<string> getResponsibilities() const override;
+    bool isAssigned() const { return assignedToPatrol; }
+    void setAssigned(bool val) { assignedToPatrol = val; }
+    json toJson() const override {
+        json j = Officer::toJson();
+        j["assignedToPatrol"] = assignedToPatrol;
+        return j;
+    }
+    void fromJson(const json& j) {
+        Officer::fromJson(j);
+        assignedToPatrol = j.value("assignedToPatrol", false);
+    }
 };
 
 // Composition: OfficerManager "has" officers
@@ -136,6 +147,13 @@ public:
     
     // Getter for officers
     const ListTemplate<Officer*>& getOfficers() const { return officers; }
+
+    // Get all available constables
+    vector<Constable> getAvailableConstables() const;
+
+    // Public getter for officerMap
+    const map<int, Officer*>& getOfficerMap() const { return officerMap; }
+    map<int, Officer*>& getOfficerMap() { return officerMap; }
 };
 
 // Singleton

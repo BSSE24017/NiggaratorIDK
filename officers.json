@@ -13,6 +13,22 @@
             "rank": "ASI",
             "role": "ASI",
             "tasks": []
+        },
+        {
+            "assignedToPatrol": false,
+            "id": 3,
+            "name": "D",
+            "rank": "Constable",
+            "role": "Constable",
+            "tasks": []
+        },
+        {
+            "assignedToPatrol": false,
+            "id": 4,
+            "name": "R",
+            "rank": "Constable",
+            "role": "Constable",
+            "tasks": []
         }
     ]
 }
