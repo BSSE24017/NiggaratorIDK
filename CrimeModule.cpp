@@ -955,7 +955,7 @@ void crimeMenu() {
                 mgr.addCase(generalCase);
                 mgr.assignProsecutorToCase(generalCase);
             }
-            cout << "Case added successfully.\n";
+            cout << "Case added successfully! You're a legend!\n";
             break;
         }
         case 2: // List Cases
@@ -1002,7 +1002,7 @@ void crimeMenu() {
                 cout << "Location added to case.\n";
             }
             else {
-                cout << "Case not found.\n";
+                cout << "Case not found. Double-check that ID!\n";
             }
             break;
         }
@@ -1066,15 +1066,15 @@ void crimeMenu() {
         }
         case 13: // Save
             mgr.save();
-            cout << "All data saved.\n";
+            cout << "All data saved.Rest Assure\n";
             break;
         case 0: // Exit
             cout << "Saving before exit...\n";
             mgr.save();
-            cout << "Exiting program. Goodbye!\n";
+            cout << "Exiting program.Byeeeeeee!\n";
             break;
         default:
-            cout << "Invalid choice. Please try again.\n";
+            cout << "Invalid choice.Check your choice again.\n";
         }
     } while (choice != 0);
 }
