@@ -2,6 +2,7 @@
 #define FORENSICSMODULE_H
 
 #include "ListTemplate.h"
+#include "crimeModule.h" // Needed to access CrimeManager
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -34,28 +35,6 @@ public:
         os << "Evidence #" << ev.evidenceId << " | Case: " << ev.caseId 
            << " | Desc: " << ev.description << " | Status: "
            << (ev.isProcessed ? "Processed" : "Unprocessed");
-        return os;
-    }
-};
-
-// ------------------------ CASE FILE ------------------------
-class CaseFile {
-    int caseId;
-    string title;
-    string status; // Open, In Progress, Resolved
-
-public:
-    CaseFile(int id = 0, string t = "", string s = "Open") : caseId(id), title(t), status(s) {}
-
-    int getId() const { return caseId; }
-    string getTitle() const { return title; }
-    string getStatus() const { return status; }
-
-    void setTitle(const string& t) { title = t; }
-    void setStatus(const string& s) { status = s; }
-
-    friend ostream& operator<<(ostream& os, const CaseFile& c) {
-        os << "Case #" << c.caseId << " - " << c.title << " [" << c.status << "]";
         return os;
     }
 };
@@ -113,7 +92,6 @@ class ForensicLab {
     ListTemplate<LabTechnician> labTechs;
     ListTemplate<FieldAgent> fieldAgents;
     ListTemplate<Evidence> evidences;
-    ListTemplate<CaseFile> caseFiles;
 
 public:
     void addLabTech(const LabTechnician& e);
@@ -126,11 +104,13 @@ public:
     void markEvidenceProcessed(int evId);
     void listAllEvidence();
 
-    void addCase(int caseId, const string& title);
-    void editCase(int caseId, const string& newTitle);
+    // Interactively link (assign) evidence to a case
+    void linkEvidenceToCase(int caseId);
+    // Interactively link (assign) a field agent to a case
+    void linkExpertToCase(int caseId);
+    void displayForensicsForCase(int caseId);
     void checkCaseProgress(int caseId);
     void markCaseResolved(int caseId);
-    void listAllCases();
 };
 
 // ------------------------ SINGLETON ------------------------

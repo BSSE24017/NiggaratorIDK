@@ -196,7 +196,7 @@ void CrimeManager::listCases() {
 
 // Function demonstrating polymorphism with getPriority()
 void CrimeManager::listCasesByPriority() {
-    std::cout << "Cases by Priority (Highest First):\n";
+    cout << "Cases by Priority (Highest First):\n";
 
     if (cases.size() == 0) {
         cout << "No cases found.\n";
@@ -204,18 +204,18 @@ void CrimeManager::listCasesByPriority() {
     }
 
     // Create a temporary vector to sort
-    std::vector<Case*> sortedCases;
+    vector<Case*> sortedCases;
     for (auto& c : cases) {
         sortedCases.push_back(c);
     }
 
     // Sort by priority (higher priority first)
-    std::sort(sortedCases.begin(), sortedCases.end(),
-        [](Case* a, Case* b) { return a->getPriority() > b->getPriority(); });
+    sort(sortedCases.begin(), sortedCases.end(),
+        [](Case* a, Case* b) {return a->getPriority() > b->getPriority(); });
 
     // Display sorted cases
     for (auto& c : sortedCases) {
-        std::cout << "Priority: " << c->getPriority() << " - ";
+        cout << "Priority: " << c->getPriority() << " - ";
         c->displayDetails();
     }
 }
