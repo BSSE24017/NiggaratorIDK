@@ -19,11 +19,6 @@
         "type": "Other"
     },
     {
-        "assignedASI": {
-            "id": 6,
-            "name": "F",
-            "rank": "ASI"
-        },
         "date": "today",
         "description": "Mama nai jota mara",
         "id": 7,
