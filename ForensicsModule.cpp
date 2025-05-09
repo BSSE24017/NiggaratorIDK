@@ -17,11 +17,13 @@ ForensicLab& ForensicLabRegistry::getLab() {
 void ForensicLab::addLabTech(const LabTechnician& e) {
     labTechs.add(e);
     cout << "Lab Tech '" << e.getName() << "' added! Let's hope they don't mix up the test tubes again.\n";
+    cout << "Forensics kit? Check. Notepad? Check. Instant noodles? Also check." << endl;
 }
 
 void ForensicLab::addFieldAgent(const FieldAgent& e) {
     fieldAgents.add(e);
     cout << "Field Agent '" << e.getName() << "' enlisted. Time to grab those cool shades and chase clues!\n";
+    cout << "This case was so easy, even my cat could've solved it. And he's a tabby." << endl;
 }
 
 void ForensicLab::listExperts() {
@@ -33,6 +35,7 @@ void ForensicLab::listExperts() {
     cout << "Field Agents:\n";
     for (const auto& fa : fieldAgents)
         cout << "- " << fa << " [" << fa.getSpecialty() << "]\n";
+    cout << "I should really write a book after this one: 'Detective Diaries and Midnight Snacks.'" << endl;
 }
 
 // --------- Evidence Handling ---------
@@ -42,6 +45,7 @@ void ForensicLab::assignEvidence(int techId, int caseId, const string& desc) {
             int evidenceId = evidences.size() + 1;
             evidences.add(Evidence(evidenceId, desc, false, caseId));
             cout << "Evidence assigned to Lab Tech #" << techId << ". Don't spill it!\n";
+            cout << "Had to bribe myself with snacks to get through this mess. Worth it." << endl;
             return;
         }
     }
@@ -53,6 +57,7 @@ void ForensicLab::markEvidenceProcessed(int evId) {
         if (evidences[i].getId() == evId) {
             evidences[i].markProcessed();
             cout << "Evidence #" << evId << " marked as processed. Lab smells a bit funky now.\n";
+            cout << "Evidence screamed the answer louder than a metal concert." << endl;
             return;
         }
     }
@@ -63,6 +68,7 @@ void ForensicLab::listAllEvidence() {
     cout << "\n--- All Evidence ---\n";
     for (const auto& e : evidences)
         cout << e << "\n";
+    cout << "The only thing messier than the crime scene was my desktop during finals." << endl;
 }
 
 // --------- Case Handling ---------
@@ -94,6 +100,7 @@ void ForensicLab::linkEvidenceToCase(int caseId) {
             }
             evidences[i] = Evidence(evidences[i].getId(), evidences[i].getDescription(), evidences[i].getStatus(), caseId);
             cout << "Evidence ID " << evidenceId << " linked to Case #" << caseId << ".\n";
+            cout << "Caught red-handed. Literally. The suspect had tomato sauce all over." << endl;
             return;
         }
     }
@@ -128,6 +135,7 @@ void ForensicLab::linkExpertToCase(int caseId) {
             }
             fieldAgents[i].setCaseId(caseId);
             cout << "Field Agent ID " << agentId << " assigned to Case #" << caseId << ".\n";
+            cout << "Almost arrested myself by mistake. Note to self: don't skip breakfast." << endl;
             return;
         }
     }
@@ -162,6 +170,7 @@ void ForensicLab::markCaseResolved(int caseId) {
     }
     cout << "\nMarking Case #" << caseId << " as resolved...\n";
     cout << "Case marked as resolved (for demonstration, no status field in Case).\n";
+    cout << "Put two and two together, and surprisingly it wasn't five this time." << endl;
 }
 
 // --------- Save & Load ---------
@@ -180,6 +189,7 @@ void ForensicLab::save() {
     file << setw(4) << data;
     file.close();
     cout << "Data saved. Hope no one hacks us now!\n";
+    cout << "Broke the case with nothing but intuition and a slightly overconfident attitude." << endl;
 }
 
 void ForensicLab::load() {
@@ -198,6 +208,7 @@ void ForensicLab::load() {
 
     file.close();
     cout << "Data loaded. Welcome back, detective!\n";
+    cout << "Tried to be cool and say 'Elementary', but I tripped on the evidence bag." << endl;
 }
 
 // --------- Menu ---------
