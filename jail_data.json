@@ -1,0 +1,95 @@
+{
+    "cells": [
+        {
+            "assignedOfficerId": -1,
+            "id": 1,
+            "type": "High Security"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 2,
+            "type": "High Security"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 3,
+            "type": "High Security"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 4,
+            "type": "High Security"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 5,
+            "type": "High Security"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 6,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 7,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 8,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 9,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 10,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 11,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 12,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": 2,
+            "id": 13,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 14,
+            "type": "Standard"
+        },
+        {
+            "assignedOfficerId": -1,
+            "id": 15,
+            "type": "Standard"
+        }
+    ],
+    "prisoners": [
+        {
+            "crime": "theft",
+            "currentCellId": 15,
+            "id": 1,
+            "name": "John",
+            "sentenceYears": 23
+        },
+        {
+            "crime": "vandalism",
+            "currentCellId": 13,
+            "id": 2,
+            "name": "John ka baap",
+            "sentenceYears": 10
+        }
+    ]
+}
