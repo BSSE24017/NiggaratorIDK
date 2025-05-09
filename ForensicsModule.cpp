@@ -73,12 +73,31 @@ void ForensicLab::linkEvidenceToCase(int caseId) {
         cout << "No such case found in main module.\n";
         return;
     }
-
-    cout << "\nLinking Evidence to Case #" << caseId << "...\n";
+    cout << "\n--- Evidence List ---\n";
+    bool found = false;
     for (const auto& ev : evidences) {
-        if (ev.getCaseId() == caseId)
-            cout << "  > " << ev << "\n";
+        cout << "  > ID: " << ev.getId() << " | Desc: " << ev.getDescription() << " | Linked to Case: " << (ev.getCaseId() > 0 ? to_string(ev.getCaseId()) : "None") << "\n";
+        found = true;
     }
+    if (!found) {
+        cout << "No evidence available to link.\n";
+        return;
+    }
+    int evidenceId;
+    cout << "Enter Evidence ID to link to Case #" << caseId << ": ";
+    cin >> evidenceId;
+    for (size_t i = 0; i < evidences.size(); ++i) {
+        if (evidences[i].getId() == evidenceId) {
+            if (evidences[i].getCaseId() == caseId) {
+                cout << "Evidence already linked to this case.\n";
+                return;
+            }
+            evidences[i] = Evidence(evidences[i].getId(), evidences[i].getDescription(), evidences[i].getStatus(), caseId);
+            cout << "Evidence ID " << evidenceId << " linked to Case #" << caseId << ".\n";
+            return;
+        }
+    }
+    cout << "Evidence ID not found.\n";
 }
 
 void ForensicLab::linkExpertToCase(int caseId) {
@@ -88,12 +107,31 @@ void ForensicLab::linkExpertToCase(int caseId) {
         cout << "No such case found in main module.\n";
         return;
     }
-
-    cout << "\nLinking Experts to Case #" << caseId << "...\n";
+    cout << "\n--- Field Agent List ---\n";
+    bool found = false;
     for (const auto& agent : fieldAgents) {
-        if (agent.getAssignedCase() == caseId)
-            cout << "  > " << agent << "\n";
+        cout << "  > ID: " << agent.getId() << " | Name: " << agent.getName() << " | Assigned Case: " << (agent.getAssignedCase() >= 0 ? to_string(agent.getAssignedCase()) : "None") << "\n";
+        found = true;
     }
+    if (!found) {
+        cout << "No field agents available to link.\n";
+        return;
+    }
+    int agentId;
+    cout << "Enter Field Agent ID to assign to Case #" << caseId << ": ";
+    cin >> agentId;
+    for (size_t i = 0; i < fieldAgents.size(); ++i) {
+        if (fieldAgents[i].getId() == agentId) {
+            if (fieldAgents[i].getAssignedCase() == caseId) {
+                cout << "Field Agent already assigned to this case.\n";
+                return;
+            }
+            fieldAgents[i].setCaseId(caseId);
+            cout << "Field Agent ID " << agentId << " assigned to Case #" << caseId << ".\n";
+            return;
+        }
+    }
+    cout << "Field Agent ID not found.\n";
 }
 
 void ForensicLab::displayForensicsForCase(int caseId) {

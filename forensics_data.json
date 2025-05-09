@@ -1,11 +1,4 @@
 {
-    "cases": [
-        {
-            "id": 2,
-            "status": "Resolved",
-            "title": "steve's murder"
-        }
-    ],
     "evidences": [
         {
             "case": 2,

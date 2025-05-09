@@ -104,7 +104,9 @@ public:
     void markEvidenceProcessed(int evId);
     void listAllEvidence();
 
+    // Interactively link (assign) evidence to a case
     void linkEvidenceToCase(int caseId);
+    // Interactively link (assign) a field agent to a case
     void linkExpertToCase(int caseId);
     void displayForensicsForCase(int caseId);
     void checkCaseProgress(int caseId);
