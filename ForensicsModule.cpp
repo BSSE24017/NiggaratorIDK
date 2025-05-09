@@ -16,14 +16,13 @@ ForensicLab& ForensicLabRegistry::getLab() {
 // --------- Lab Functions ---------
 void ForensicLab::addLabTech(const LabTechnician& e) {
     labTechs.add(e);
-    cout << "Lab Tech '" << e.getName() << "' added! Let's hope they don't mix up the test tubes again.\n";
-    cout << "Forensics kit? Check. Notepad? Check. Instant noodles? Also check." << endl;
+    cout << "Lab Tech '" << e.getName() << "' added! \n";
+    cout << "(Forensics kit? Check. Notepad? Check. Instant noodles? Also check.)" << endl;
 }
 
 void ForensicLab::addFieldAgent(const FieldAgent& e) {
     fieldAgents.add(e);
-    cout << "Field Agent '" << e.getName() << "' enlisted. Time to grab those cool shades and chase clues!\n";
-    cout << "This case was so easy, even my cat could've solved it. And he's a tabby." << endl;
+    cout << "Field Agent '" << e.getName() << "' enlisted. \n";
 }
 
 void ForensicLab::listExperts() {
@@ -45,7 +44,7 @@ void ForensicLab::assignEvidence(int techId, int caseId, const string& desc) {
             int evidenceId = evidences.size() + 1;
             evidences.add(Evidence(evidenceId, desc, false, caseId));
             cout << "Evidence assigned to Lab Tech #" << techId << ". Don't spill it!\n";
-            cout << "Had to bribe myself with snacks to get through this mess. Worth it." << endl;
+            cout << "(Had to bribe myself with snacks to get through this mess. Worth it.)" << endl;
             return;
         }
     }
