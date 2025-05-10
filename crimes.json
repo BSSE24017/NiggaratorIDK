@@ -1,43 +1,24 @@
 [
     {
-        "date": "2019-07-23",
-        "description": "titanium back, white color, batman case",
+        "assignedProsecutor": {
+            "id": 3,
+            "name": "CVB",
+            "rank": "Prosecutor"
+        },
+        "date": "2025-0x-yy",
+        "description": "Sister took it",
         "id": 1,
-        "itemStolen": "iphone pro ultra max 10g",
-        "recovered": false,
-        "reportedBy": "owner bhai, or nai to chor kre ga",
+        "itemStolen": "Iphone 16e",
+        "location": {
+            "address": "Garden Town",
+            "city": "Lahore",
+            "state": "Punjab",
+            "zipCode": "54000"
+        },
+        "recovered": true,
+        "reportedBy": "Myself",
         "severity": 2.0,
-        "stolenValue": 3000.0,
+        "stolenValue": 599.0,
         "type": "Theft"
-    },
-    {
-        "date": "2024-09-01",
-        "description": "Hit & run (karachi shapatr) //sorry urdu weak if thats the right term",
-        "id": 2,
-        "reportedBy": "chor hoon",
-        "severity": 4.0,
-        "type": "Other"
-    },
-    {
-        "date": "today",
-        "description": "Mama nai jota mara",
-        "id": 7,
-        "injurySeverity": 2,
-        "reportedBy": "Victim duh",
-        "severity": 5.0,
-        "type": "Assault",
-        "victimName": "Me",
-        "weaponUsed": false
-    },
-    {
-        "damageValue": 40.0,
-        "date": "today",
-        "description": "cricket ball hit",
-        "id": 4,
-        "propertyType": "window",
-        "publicProperty": false,
-        "reportedBy": "house uncle",
-        "severity": 2.0,
-        "type": "Vandalism"
     }
 ]

@@ -20,7 +20,7 @@ public:
 class Vehicle : public DisplayVehicleInfo {
 protected:
     string type;
-    int vehicleId;
+    string vehicleId;  // Changed to string to store "V1", "V2", etc.
     string model;
     int year;
     string color;
@@ -36,14 +36,16 @@ protected:
     double price;
 
 public:
-    static int nextId;
+    static int nextId;  // Static counter for IDs
+
     Vehicle();
-    Vehicle(string t, int id = 0);
-    virtual ~Vehicle() {}
+    Vehicle(string t);
+    virtual ~Vehicle() = default;
 
     // Getters
     virtual string getType() const { return type; }
-    int getId() const { return vehicleId; }
+    string getId() const { return vehicleId; }  // Changed return type to string
+    int getIdNumber() const { return stoi(vehicleId.substr(1)); }  // Helper to get numeric ID
     string getModel() const { return model; }
     int getYear() const { return year; }
     string getColor() const { return color; }
@@ -81,8 +83,7 @@ public:
 
 class Car : public Vehicle {
 public:
-    Car();
-    Car(int id);
+    Car();  // No ID parameter needed
     json toJson() const override;
     void fromJson(const json& j) override;
     void displayInfo() const override;
@@ -90,8 +91,7 @@ public:
 
 class Bike : public Vehicle {
 public:
-    Bike();
-    Bike(int id);
+    Bike();  // No ID parameter needed
     json toJson() const override;
     void fromJson(const json& j) override;
     void displayInfo() const override;
@@ -109,8 +109,19 @@ private:
     vector<Constable> assignedConstables;
 
 public:
+    static int nextPatrolId;
+    static map<string, Patrol*> patrolRegistry;  // Static registry for all patrols
+    static Patrol* getPatrolById(const string& id);  // Static method to get patrol by ID
+    static void clearRegistry();                     // Static method to clear registry
+
     Patrol();
     Patrol(string id, string area, int vehicleId, const vector<Constable>& constables);
+    ~Patrol() {
+        // Remove from registry when destroyed
+        if (!patrolId.empty()) {
+            patrolRegistry.erase(patrolId);
+        }
+    }
     
     // Getters
     string getPatrolId() const { return patrolId; }
@@ -139,7 +150,9 @@ class PatrolFleet {
     map<string, Patrol> patrols;  // patrolId -> Patrol
     static int nextPatrolId;
 public:
-    PatrolFleet();
+    PatrolFleet() = default;
+    
+    // Vehicle management
     void addVehicle(const Vehicle& v);
     void listVehicles();
     const vector<Vehicle>& getVehicles() const;
@@ -149,7 +162,7 @@ public:
     bool updateVehicleStatus(int id, const string& status);
     bool updateMaintenanceHistory(int id, const string& history);
 
-    // Patrol management methods
+    // Patrol management
     string createPatrol(int vehicleId, const string& area, const vector<Constable>& constables);
     bool endPatrol(const string& patrolId);
     bool addPatrolLog(const string& patrolId, const string& logEntry);
@@ -162,6 +175,12 @@ public:
     void loadVehiclesFromFile(const string& filename);
     void savePatrolsToFile(const string& filename) const;
     void loadPatrolsFromFile(const string& filename);
+
+    // Clear functions
+    void clearAllData();
+    void clearVehicles();
+    void clearPatrols();
+    void clearFiles(const string& vehiclesFile = "vehicles.json", const string& patrolsFile = "patrolling.json");
 };
 
 class FleetRegistry {

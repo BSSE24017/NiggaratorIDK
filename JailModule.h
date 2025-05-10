@@ -1,4 +1,5 @@
 #pragma once
+#include "ListTemplate.h"
 #include "OfficerModule.h"
 #include <string>
 #include <fstream>
@@ -7,13 +8,7 @@
 #include <map>
 using namespace std;
 
-class DisplayJailInfo {
-public:
-    virtual void displayJailInfo() const = 0;
-    virtual ~DisplayJailInfo() = default;
-};
-
-class Prisoner : public DisplayJailInfo {
+class Prisoner {
 private:
     int prisonerId;
     string name;
@@ -31,10 +26,6 @@ public:
     int getCurrentCellId() const { return currentCellId; }
     void setCurrentCellId(int cellId) { currentCellId = cellId; }
     
-    void displayJailInfo() const override {
-        cout << *this << endl;
-    }
-    
     friend ostream& operator<<(ostream& os, const Prisoner& p) {
         os << "Prisoner ID: " << p.prisonerId << "\n"
            << "Name: " << p.name << "\n"
@@ -45,7 +36,7 @@ public:
     }
 };
 
-class Cell : public DisplayJailInfo {
+class Cell {
 protected:
     int cellId;
     int capacity;
@@ -82,10 +73,6 @@ public:
     void assignOfficer(Officer* officer) { assignedOfficer = officer; }
     Officer* getAssignedOfficer() const { return assignedOfficer; }
     
-    void displayJailInfo() const override {
-        cout << *this << endl;
-    }
-    
     virtual ~Cell() {}
     bool operator==(const Cell& other) const { return cellId == other.cellId; }
     friend ostream& operator<<(ostream& os, const Cell& c) {
@@ -116,24 +103,24 @@ class Jail {
     static const int HIGH_SEC_CAPACITY = 2;
     static const int STANDARD_CAPACITY = 4;
     
-    vector<HighSecurityCell> highSecCells;
-    vector<StandardCell> standardCells;
+    ListTemplate<HighSecurityCell> highSecCells;
+    ListTemplate<StandardCell> standardCells;
     map<int, Cell*> cellMap;
     map<int, Prisoner*> prisonerMap;
     
     void initializeCells() {
         // Initialize High Security Cells
         for (int i = 1; i <= NUM_HIGH_SEC_CELLS; i++) {
-            HighSecurityCell cell = HighSecurityCell(i, HIGH_SEC_CAPACITY);
-            highSecCells.push_back(cell);
-            cellMap[i] = &highSecCells[i - 1];
+            HighSecurityCell* cell = new HighSecurityCell(i, HIGH_SEC_CAPACITY);
+            highSecCells.add(*cell);
+            cellMap[i] = cell;
         }
         
         // Initialize Standard Cells
         for (int i = NUM_HIGH_SEC_CELLS + 1; i <= NUM_HIGH_SEC_CELLS + NUM_STANDARD_CELLS; i++) {
-            StandardCell cell = StandardCell(i, STANDARD_CAPACITY);
-            standardCells.push_back(cell);
-            cellMap[i] = &standardCells[i - NUM_HIGH_SEC_CELLS - 1];
+            StandardCell* cell = new StandardCell(i, STANDARD_CAPACITY);
+            standardCells.add(*cell);
+            cellMap[i] = cell;
         }
     }
     

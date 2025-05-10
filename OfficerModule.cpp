@@ -407,4 +407,14 @@ vector<Prosecutor*> OfficerManager::getProsecutors() const {
         }
     }
     return result;
+}
+
+vector<HeadConstable*> OfficerManager::getHeadConstables() const {
+    vector<HeadConstable*> result;
+    for (const auto* officer : officers) {
+        if (officer->getRole() == "Head Constable") {
+            result.push_back(const_cast<HeadConstable*>(static_cast<const HeadConstable*>(officer)));
+        }
+    }
+    return result;
 } 

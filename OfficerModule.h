@@ -153,6 +153,9 @@ public:
     // Get all prosecutors
     vector<Prosecutor*> getProsecutors() const;
 
+    // Get all head constables
+    vector<HeadConstable*> getHeadConstables() const;
+
     // Public getter for officerMap
     const map<int, Officer*>& getOfficerMap() const { return officerMap; }
     map<int, Officer*>& getOfficerMap() { return officerMap; }

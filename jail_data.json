@@ -61,7 +61,7 @@
             "type": "Standard"
         },
         {
-            "assignedOfficerId": 2,
+            "assignedOfficerId": -1,
             "id": 13,
             "type": "Standard"
         },
@@ -71,25 +71,25 @@
             "type": "Standard"
         },
         {
-            "assignedOfficerId": -1,
+            "assignedOfficerId": 2,
             "id": 15,
             "type": "Standard"
         }
     ],
     "prisoners": [
         {
-            "crime": "theft",
+            "crime": "vandalism",
             "currentCellId": 15,
             "id": 1,
-            "name": "John",
-            "sentenceYears": 23
+            "name": "a",
+            "sentenceYears": 6
         },
         {
-            "crime": "vandalism",
-            "currentCellId": 13,
-            "id": 2,
-            "name": "John ka baap",
-            "sentenceYears": 10
+            "crime": "theft",
+            "currentCellId": 8,
+            "id": 8,
+            "name": "HJK",
+            "sentenceYears": 34
         }
     ]
 }

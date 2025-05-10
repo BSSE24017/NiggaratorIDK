@@ -2,28 +2,28 @@
     "officers": [
         {
             "id": 1,
-            "name": "A",
+            "name": "HJK",
             "rank": "SHO",
             "role": "SHO",
             "tasks": []
         },
         {
             "id": 2,
-            "name": "B",
+            "name": "GFR",
             "rank": "CO",
             "role": "CO",
             "tasks": []
         },
         {
             "id": 3,
-            "name": "C",
-            "rank": "ASI",
-            "role": "ASI",
+            "name": "CVB",
+            "rank": "Prosecutor",
+            "role": "Prosecutor",
             "tasks": []
         },
         {
             "id": 4,
-            "name": "D",
+            "name": "XZA",
             "rank": "Head Constable",
             "role": "Head Constable",
             "tasks": []
@@ -31,16 +31,9 @@
         {
             "assignedToPatrol": false,
             "id": 5,
-            "name": "E",
+            "name": "ijk",
             "rank": "Constable",
             "role": "Constable",
-            "tasks": []
-        },
-        {
-            "id": 6,
-            "name": "F",
-            "rank": "ASI",
-            "role": "ASI",
             "tasks": []
         }
     ]

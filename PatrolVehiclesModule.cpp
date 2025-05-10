@@ -1,64 +1,70 @@
 #include "PatrolVehiclesModule.h"
 
-int Vehicle::nextId = 1;
-int PatrolFleet::nextPatrolId = 1;
+int Vehicle::nextId = 0;
+int Patrol::nextPatrolId = 0;
+map<string, Patrol*> Patrol::patrolRegistry;  // Add static member definition
 
 FleetRegistry* FleetRegistry::instance = nullptr;
 
 // Vehicle constructors
-Vehicle::Vehicle() : type(""), vehicleId(0), year(0), mileage(0.0), engineSize(0.0), numSeats(0), availabilityStatus(true), price(0.0) {
-    vehicleId = nextId++;
+Vehicle::Vehicle() : type(""), year(0), mileage(0.0), engineSize(0.0), numSeats(0), 
+    availabilityStatus(true), price(0.0), fuelType("Petrol"), transmissionType("Automatic"), 
+    vehicleClass("Standard") {
+    vehicleId = "V" + to_string(++nextId);
 }
-Vehicle::Vehicle(string t, int id) : type(t) {
-    if (id == 0) {
-        vehicleId = nextId;
-        nextId++;
-    } else vehicleId = id;
+
+Vehicle::Vehicle(string t) : type(t), mileage(0.0), engineSize(0.0), 
+    fuelType("Petrol"), transmissionType("Automatic"), vehicleClass("Standard") {
+    vehicleId = "V" + to_string(++nextId);
     availabilityStatus = true;
-    mileage = 0.0;
 }
+
 Car::Car() : Vehicle("Car") {}
-Car::Car(int id) : Vehicle("Car", id) {}
 Bike::Bike() : Vehicle("Bike") {}
-Bike::Bike(int id) : Vehicle("Bike", id) {}
 
 // Vehicle operator implementation
 ostream& operator<<(ostream& os, const Vehicle& v) {
-    os << v.type << " (ID: " << v.vehicleId << ")\n"
-       << "Model: " << v.model << "\n"
-       << "Year: " << v.year << "\n"
-       << "Color: " << v.color << "\n"
-       << "License Plate: " << v.licensePlate << "\n"
-       << "Mileage: " << v.mileage << "\n"
-       << "Fuel Type: " << v.fuelType << "\n"
-       << "Engine Size: " << v.engineSize << "\n"
-       << "Transmission: " << v.transmissionType << "\n"
-       << "Seats: " << v.numSeats << "\n"
-       << "Class: " << v.vehicleClass << "\n"
-       << "Status: " << (v.availabilityStatus ? "Available" : "Unavailable") << "\n"
-       << "Maintenance History: " << v.maintenanceHistory;
+    os << "\n"
+       << "╔═══════════════════════════════════════════════════════════╗\n"
+       << "║                      VEHICLE DETAILS                      ║\n"
+       << "╠═══════════════════════════════════════════════════════════╣\n"
+       << "║ Type: " << left << setw(52) << v.type << "║\n"
+       << "║ ID: " << left << setw(54) << v.vehicleId << "║\n"
+       << "║ Model: " << left << setw(51) << v.model << "║\n"
+       << "║ Year: " << left << setw(52) << v.year << "║\n"
+       << "║ Color: " << left << setw(51) << v.color << "║\n"
+       << "║ License Plate: " << left << setw(42) << v.licensePlate << "║\n"
+       << "║ Mileage: " << left << setw(47) << (to_string(v.mileage) + " km") << "║\n"
+       << "║ Fuel Type: " << left << setw(46) << v.fuelType << "║\n"
+       << "║ Engine Size: " << left << setw(44) << (to_string(v.engineSize) + " L") << "║\n"
+       << "║ Transmission: " << left << setw(45) << v.transmissionType << "║\n"
+       << "║ Seats: " << left << setw(52) << v.numSeats << "║\n"
+       << "║ Class: " << left << setw(52) << v.vehicleClass << "║\n"
+       << "║ Status: " << left << setw(51) << (v.availabilityStatus ? "Available" : "Unavailable") << "║\n"
+       << "║ Maintenance History: " << left << setw(33) << v.maintenanceHistory << "║\n"
+       << "╚═══════════════════════════════════════════════════════════╝\n";
     return os;
 }
 
 json Vehicle::toJson() const {
     try {
-        return json{
-            {"type", type},
-            {"vehicleId", vehicleId},
-            {"model", model},
-            {"year", year},
-            {"color", color},
-            {"licensePlate", licensePlate},
-            {"mileage", mileage},
-            {"fuelType", fuelType},
-            {"engineSize", engineSize},
-            {"transmissionType", transmissionType},
-            {"numSeats", numSeats},
-            {"vehicleClass", vehicleClass},
-            {"maintenanceHistory", maintenanceHistory},
-            {"availabilityStatus", availabilityStatus},
-            {"price", price}
-        };
+    return json{
+        {"type", type},
+        {"vehicleId", vehicleId},
+        {"model", model},
+        {"year", year},
+        {"color", color},
+        {"licensePlate", licensePlate},
+        {"mileage", mileage},
+        {"fuelType", fuelType},
+        {"engineSize", engineSize},
+        {"transmissionType", transmissionType},
+        {"numSeats", numSeats},
+        {"vehicleClass", vehicleClass},
+        {"maintenanceHistory", maintenanceHistory},
+        {"availabilityStatus", availabilityStatus},
+        {"price", price}
+    };
     } catch (const exception& e) {
         cout << "Error serializing Vehicle to JSON: " << e.what() << endl;
         return json{};
@@ -67,21 +73,21 @@ json Vehicle::toJson() const {
 
 void Vehicle::fromJson(const json& j) {
     try {
-        type = j.value("type", "");
-        vehicleId = j.value("vehicleId", 0);
-        model = j.value("model", "");
-        year = j.value("year", 0);
-        color = j.value("color", "");
-        licensePlate = j.value("licensePlate", "");
-        mileage = j.value("mileage", 0.0);
-        fuelType = j.value("fuelType", "");
-        engineSize = j.value("engineSize", 0.0);
-        transmissionType = j.value("transmissionType", "");
-        numSeats = j.value("numSeats", 0);
-        vehicleClass = j.value("vehicleClass", "");
-        maintenanceHistory = j.value("maintenanceHistory", "");
-        availabilityStatus = j.value("availabilityStatus", true);
-        price = j.value("price", 0.0);
+    type = j.value("type", "");
+    vehicleId = j.value("vehicleId", "");
+    model = j.value("model", "");
+    year = j.value("year", 0);
+    color = j.value("color", "");
+    licensePlate = j.value("licensePlate", "");
+    mileage = j.value("mileage", 0.0);
+    fuelType = j.value("fuelType", "Petrol");
+    engineSize = j.value("engineSize", 0.0);
+    transmissionType = j.value("transmissionType", "Automatic");
+    numSeats = j.value("numSeats", 0);
+    vehicleClass = j.value("vehicleClass", "Standard");
+    maintenanceHistory = j.value("maintenanceHistory", "");
+    availabilityStatus = j.value("availabilityStatus", true);
+    price = j.value("price", 0.0);
     } catch (const exception& e) {
         cout << "Error deserializing Vehicle from JSON: " << e.what() << endl;
     }
@@ -122,12 +128,21 @@ void Bike::fromJson(const json& j) {
 }
 
 // Patrol constructors
-Patrol::Patrol() : vehicleId(0), status("Inactive"), startTime(""), endTime("") {}
+Patrol::Patrol() : vehicleId(0), status("Inactive"), startTime(""), endTime("") {
+    patrolId = "P" + to_string(++nextPatrolId);
+}
+
 Patrol::Patrol(string id, string area, int vehicleId, const vector<Constable>& constables)
     : patrolId(id), area(area), vehicleId(vehicleId), assignedConstables(constables) {
     status = "Active";
     startTime = "Started";
     endTime = "";
+    if (id != "") {
+        int numId = stoi(id.substr(1));  // Remove 'P' and convert to number
+        if (numId >= nextPatrolId) {
+            nextPatrolId = numId + 1;
+        }
+    }
 }
 
 json Patrol::toJson() const {
@@ -184,22 +199,35 @@ void Patrol::addLog(const string& logEntry) {
 }
 
 void Patrol::displayInfo() const {
-    cout << "\nPatrol Information:\n";
-    cout << "Patrol ID: " << patrolId << "\n";
-    cout << "Area: " << area << "\n";
-    cout << "Vehicle ID: " << vehicleId << "\n";
-    cout << "Status: " << status << "\n";
-    cout << "Assigned Constables: ";
-    for (const auto& c : assignedConstables)
-        cout << c.getName() << " (" << c.getId() << ") ";
-    cout << "\nStart Time: " << startTime << "\n";
+    cout << "\n"
+         << "╔════════════════════════════════════════════════════════════╗\n"
+         << "║                      PATROL DETAILS                        ║\n"
+         << "╠════════════════════════════════════════════════════════════╣\n"
+         << "║ Patrol ID: " << setw(41) << left << patrolId << "║\n"
+         << "║ Area: " << setw(46) << left << area << "║\n"
+         << "║ Vehicle ID: " << setw(40) << left << vehicleId << "║\n"
+         << "║ Status: " << setw(44) << left << status << "║\n"
+         << "║ Start Time: " << setw(40) << left << startTime << "║\n";
     if (!endTime.empty()) {
-        cout << "End Time: " << endTime << "\n";
+        cout << "║ End Time: " << setw(42) << left << endTime << "║\n";
     }
-    cout << "\nPatrol Logs:\n";
-    for (const auto& log : logs) {
-        cout << log << "\n";
+    cout << "╠════════════════════════════════════════════════════════════╣\n"
+         << "║                    ASSIGNED CONSTABLES                     ║\n"
+         << "╠════════════════════════════════════════════════════════════╣\n";
+    for (const auto& c : assignedConstables) {
+        cout << "║ • " << setw(49) << left << (c.getName() + " (ID: " + to_string(c.getId()) + ")") << "║\n";
     }
+    cout << "╠════════════════════════════════════════════════════════════╣\n"
+         << "║                        PATROL LOGS                         ║\n"
+         << "╠════════════════════════════════════════════════════════════╣\n";
+    if (logs.empty()) {
+        cout << "║ No logs available" << setw(43) << right << "║\n";
+    } else {
+        for (const auto& log : logs) {
+            cout << "║ • " << setw(49) << left << log << "║\n";
+        }
+    }
+    cout << "╚════════════════════════════════════════════════════════════╝\n";
 }
 
 ostream& operator<<(ostream& os, const Patrol& p) {
@@ -218,21 +246,30 @@ ostream& operator<<(ostream& os, const Patrol& p) {
 }
 
 // PatrolFleet constructors
-PatrolFleet::PatrolFleet() {}
+// PatrolFleet::PatrolFleet() {}
 const vector<Vehicle>& PatrolFleet::getVehicles() const { return vehicles; }
 vector<Vehicle>& PatrolFleet::getVehicles() { return vehicles; }
 
 // PatrolFleet implementations
 void PatrolFleet::addVehicle(const Vehicle& v) {
     vehicles.push_back(v);
-    vehicleMap[v.getId()] = v;
+    vehicleMap[v.getIdNumber()] = v;
 }
 
 void PatrolFleet::listVehicles() {
-    cout << "Vehicles:\n";
-    for (const auto& pair : vehicleMap) {
-        cout << pair.second << "\n";
+    cout << "\n"
+         << "╔════════════════════════════════════════════════════════════╗\n"
+         << "║                      VEHICLE LIST                          ║\n"
+         << "╠════════════════════════════════════════════════════════════╣\n";
+    if (vehicleMap.empty()) {
+        cout << "║ No vehicles available" << setw(41) << right << "║\n";
+    } else {
+        for (const auto& pair : vehicleMap) {
+            string vehicleInfo = pair.second.getType() + " (ID: " + pair.second.getId() + ")";
+            cout << "║ • " << setw(47) << left << vehicleInfo << "║\n";
+        }
     }
+    cout << "╚════════════════════════════════════════════════════════════╝\n";
 }
 
 bool PatrolFleet::searchVehicle(int id) const {
@@ -275,7 +312,7 @@ string PatrolFleet::createPatrol(int vehicleId, const string& area, const vector
     if (!vehicleMap[vehicleId].getAvailabilityStatus()) {
         return "";
     }
-    string patrolId = "P" + to_string(nextPatrolId++);
+    string patrolId = "P" + to_string(Patrol::nextPatrolId++);
     patrols[patrolId] = Patrol(patrolId, area, vehicleId, constables);
     vehicleMap[vehicleId].setAvailabilityStatus(false);
     return patrolId;
@@ -300,12 +337,21 @@ bool PatrolFleet::addPatrolLog(const string& patrolId, const string& logEntry) {
 }
 
 void PatrolFleet::listPatrols() const {
-    cout << "\nActive Patrols:\n";
+    cout << "\n"
+         << "╔════════════════════════════════════════════════════════════╗\n"
+         << "║                    ACTIVE PATROLS                          ║\n"
+         << "╠════════════════════════════════════════════════════════════╣\n";
+    bool found = false;
     for (const auto& pair : patrols) {
         if (pair.second.getStatus() == "Active") {
-            cout << pair.second << "\n";
+            cout << "║ • " << setw(49) << left << (pair.second.getPatrolId() + " - " + pair.second.getArea()) << "║\n";
+            found = true;
         }
     }
+    if (!found) {
+        cout << "║ No active patrols" << setw(43) << right << "║\n";
+    }
+    cout << "╚════════════════════════════════════════════════════════════╝\n";
 }
 
 bool PatrolFleet::searchPatrol(const string& patrolId) const {
@@ -338,15 +384,16 @@ void PatrolFleet::loadVehiclesFromFile(const string& filename) {
         file >> jArr;
         vehicles.clear();
         vehicleMap.clear();
+        Vehicle::nextId = 0;  // Reset counter
         for (const auto& jv : jArr) {
             string type = jv.value("type", "");
             Vehicle* v = nullptr;
             if (type == "Car") v = new Car();
             else if (type == "Bike") v = new Bike();
-            else v = new Vehicle();
+            else v = new Vehicle(type);
             v->fromJson(jv);
             vehicles.push_back(*v);
-            vehicleMap[v->getId()] = *v;
+            vehicleMap[v->getIdNumber()] = *v;
             delete v;
         }
     } catch (const exception& e) {
@@ -374,10 +421,17 @@ void PatrolFleet::loadPatrolsFromFile(const string& filename) {
         json jArr;
         file >> jArr;
         patrols.clear();
+        Patrol::clearRegistry();  // Use Patrol's static clear method
         for (const auto& jp : jArr) {
             Patrol p;
             p.fromJson(jp);
             patrols[p.getPatrolId()] = p;
+            if (p.getPatrolId() != "") {
+                int numId = stoi(p.getPatrolId().substr(1));
+                if (numId >= Patrol::nextPatrolId) {
+                    Patrol::nextPatrolId = numId + 1;
+                }
+            }
         }
     } catch (const exception& e) {
         cout << "Error loading patrols from file: " << e.what() << endl;
@@ -399,18 +453,24 @@ PatrolFleet& FleetRegistry::getFleet() { return fleet; }
 void vehicleMenu(PatrolFleet& fleet) {
     int choice;
     do {
-        cout << "\n--- Vehicle Management ---\n";
-        cout << "1. Add Car\n"
-             << "2. Add Bike\n"
-             << "3. List Vehicles\n"
-             << "4. Search Vehicle\n"
-             << "5. Update Availability\n"
-             << "6. Update Maintenance History\n"
-             << "7. Save Vehicles\n"
-             << "8. Load Vehicles\n"
-             << "0. Back\n"
-             << "Choice: ";
+        cout << "\n"
+             << "╔════════════════════════════════════════════════════════════╗\n"
+             << "║                    VEHICLE MANAGEMENT                      ║\n"
+             << "╠════════════════════════════════════════════════════════════╣\n"
+             << "║ 1. Add Car                                                 ║\n"
+             << "║ 2. Add Bike                                                ║\n"
+             << "║ 3. List Vehicles                                           ║\n"
+             << "║ 4. Search Vehicle                                          ║\n"
+             << "║ 5. Update Availability                                     ║\n"
+             << "║ 6. Update Maintenance History                              ║\n"
+             << "║ 7. Save Vehicles                                           ║\n"
+             << "║ 8. Load Vehicles                                           ║\n"
+             << "║ 9. Clear Vehicles                                          ║\n"
+             << "║ 0. Back                                                    ║\n"
+             << "╠════════════════════════════════════════════════════════════╣\n"
+             << "║ Choice: ";
         cin >> choice;
+        cout << "╚════════════════════════════════════════════════════════════╝\n";
         
         if (choice == 1 || choice == 2) {
             Vehicle* v = nullptr;
@@ -422,8 +482,6 @@ void vehicleMenu(PatrolFleet& fleet) {
             }
             
             string input;
-            int numInput;
-            double doubleInput;
             
             // Required fields
             cout << "Enter model (e.g., Toyota Camry): ";
@@ -435,7 +493,7 @@ void vehicleMenu(PatrolFleet& fleet) {
             getline(cin, input);
             v->setLicensePlate(input);
             
-            // Optional fields
+            // Optional fields with defaults
             cout << "Enter year (press Enter to skip): ";
             getline(cin, input);
             if (!input.empty()) {
@@ -452,6 +510,36 @@ void vehicleMenu(PatrolFleet& fleet) {
             getline(cin, input);
             if (!input.empty()) {
                 v->setMileage(stod(input));
+            }
+            
+            cout << "Enter fuel type (press Enter to skip): ";
+            getline(cin, input);
+            if (!input.empty()) {
+                v->setFuelType(input);
+            }
+            
+            cout << "Enter engine size in L (press Enter to skip): ";
+            getline(cin, input);
+            if (!input.empty()) {
+                v->setEngineSize(stod(input));
+            }
+            
+            cout << "Enter transmission type (press Enter to skip): ";
+            getline(cin, input);
+            if (!input.empty()) {
+                v->setTransmissionType(input);
+            }
+            
+            cout << "Enter number of seats (press Enter to skip): ";
+            getline(cin, input);
+            if (!input.empty()) {
+                v->setNumSeats(stoi(input));
+            }
+            
+            cout << "Enter vehicle class (press Enter to skip): ";
+            getline(cin, input);
+            if (!input.empty()) {
+                v->setVehicleClass(input);
             }
             
             cout << "Enter maintenance history (press Enter to skip): ";
@@ -509,31 +597,60 @@ void vehicleMenu(PatrolFleet& fleet) {
             fleet.loadVehiclesFromFile("vehicles.json");
             cout << "Vehicles loaded from vehicles.json\n";
         }
+        else if (choice == 9) {
+            char confirm;
+            cout << "Are you sure you want to clear all vehicles? (y/n): ";
+            cin >> confirm;
+            if (confirm == 'y' || confirm == 'Y') {
+                fleet.clearVehicles();
+            }
+        }
     } while (choice != 0);
 }
 
 void patrolMenu(PatrolFleet& fleet) {
     int choice;
     do {
-        cout << "\n--- Patrol Management ---\n";
-        cout << "1. Create New Patrol\n"
-             << "2. End Patrol\n"
-             << "3. Add Patrol Log\n"
-             << "4. List Active Patrols\n"
-             << "5. Search Patrol\n"
-             << "6. Save Patrols\n"
-             << "7. Load Patrols\n"
-             << "0. Back\n"
-             << "Choice: ";
+        cout << "\n"
+             << "╔═══════════════════════════════════════════════════════╗\n"
+             << "║                    PATROL MANAGEMENT                  ║\n"
+             << "╠═══════════════════════════════════════════════════════╣\n"
+             << "║ 1. Create New Patrol                                  ║\n"
+             << "║ 2. End Patrol                                         ║\n"
+             << "║ 3. Add Patrol Log                                     ║\n"
+             << "║ 4. List Active Patrols                                ║\n"
+             << "║ 5. Search Patrol                                      ║\n"
+             << "║ 6. Save Patrols                                       ║\n"
+             << "║ 7. Load Patrols                                       ║\n"
+             << "║ 8. Clear Patrols                                      ║\n"
+             << "║ 0. Back                                               ║\n"
+             << "╠═══════════════════════════════════════════════════════╣\n"
+             << "║ Choice: ";
         cin >> choice;
+        cout << "╚═══════════════════════════════════════════════════════╝\n";
         
         if (choice == 1) {
+            string vehicleIdStr;
             int vehicleId;
-            string area;
-            cout << "Enter vehicle ID for patrol: ";
-            cin >> vehicleId;
+            cout << "Enter vehicle ID for patrol (e.g., V1, V2): ";
+            cin >> vehicleIdStr;
+            
+            // Convert V1, V2, etc. to 1, 2, etc.
+            if (vehicleIdStr[0] == 'V' || vehicleIdStr[0] == 'v') {
+                try {
+                    vehicleId = stoi(vehicleIdStr.substr(1));
+                } catch (...) {
+                    cout << "Invalid vehicle ID format. Please use format V1, V2, etc.\n";
+                    continue;
+                }
+            } else {
+                cout << "Invalid vehicle ID format. Please use format V1, V2, etc.\n";
+                continue;
+            }
+            
             cin.ignore();
             cout << "Enter patrol area: ";
+            string area;
             getline(cin, area);
 
              // Fetch available constables
@@ -639,20 +756,41 @@ void patrolMenu(PatrolFleet& fleet) {
             fleet.loadPatrolsFromFile("patrolling.json");
             cout << "Patrols loaded from patrolling.json\n";
         }
+        else if (choice == 8) {
+            char confirm;
+            cout << "Are you sure you want to clear all patrols? (y/n): ";
+            cin >> confirm;
+            if (confirm == 'y' || confirm == 'Y') {
+                fleet.clearPatrols();
+            }
+        }
     } while (choice != 0);
 }
 
 void patrolVehiclesMenu() {
     PatrolFleet& fleet = FleetRegistry::getInstance()->getFleet();
     
+    // Load all data on startup
+    cout << "Loading saved data...\n";
+    fleet.loadVehiclesFromFile("vehicles.json");
+    fleet.loadPatrolsFromFile("patrolling.json");
+    cout << "Data loaded successfully.\n";
+    
     int choice;
     do {
-        cout << "\n--- Patrol Vehicles System ---\n";
-        cout << "1. Patrols\n"
-             << "2. Vehicles\n"
-             << "0. Exit\n"
-             << "Choice: ";
+        cout << "\n"
+             << "╔══════════════════════════════════════════════════════════╗\n"
+             << "║                 PATROL VEHICLES SYSTEM                   ║\n"
+             << "╠══════════════════════════════════════════════════════════╣\n"
+             << "║ 1. Patrols                                               ║\n"
+             << "║ 2. Vehicles                                              ║\n"
+             << "║ 3. Clear All Data                                        ║\n"
+             << "║ 4. Clear All Files                                       ║\n"
+             << "║ 0. Exit                                                  ║\n"
+             << "╠══════════════════════════════════════════════════════════╣\n"
+             << "║ Choice: ";
         cin >> choice;
+        cout << "╚══════════════════════════════════════════════════════════╝\n";
         
         if (choice == 1) {
             patrolMenu(fleet);
@@ -660,7 +798,29 @@ void patrolVehiclesMenu() {
         else if (choice == 2) {
             vehicleMenu(fleet);
         }
+        else if (choice == 3) {
+            char confirm;
+            cout << "Are you sure you want to clear all data from memory? (y/n): ";
+            cin >> confirm;
+            if (confirm == 'y' || confirm == 'Y') {
+                fleet.clearAllData();
+            }
+        }
+        else if (choice == 4) {
+            char confirm;
+            cout << "Are you sure you want to clear all files? (y/n): ";
+            cin >> confirm;
+            if (confirm == 'y' || confirm == 'Y') {
+                fleet.clearFiles();
+            }
+        }
     } while (choice != 0);
+
+    // Save all data before exiting
+    cout << "\nSaving data before exit...\n";
+    fleet.saveVehiclesToFile("vehicles.json");
+    fleet.savePatrolsToFile("patrolling.json");
+    cout << "Data saved successfully.\n";
 }
 
 void Vehicle::displayInfo() const {
@@ -676,4 +836,56 @@ void Car::displayInfo() const {
 void Bike::displayInfo() const {
     cout << "Bike Info:" << endl;
     cout << *this << endl;
+}
+
+void PatrolFleet::clearVehicles() {
+    vehicles.clear();
+    vehicleMap.clear();
+    Vehicle::nextId = 0;  // Reset counter
+    cout << "All vehicles cleared from memory.\n";
+}
+
+void PatrolFleet::clearPatrols() {
+    patrols.clear();
+    Patrol::clearRegistry();  // Use Patrol's static clear method
+    cout << "All patrols cleared from memory.\n";
+}
+
+void PatrolFleet::clearAllData() {
+    clearVehicles();
+    clearPatrols();
+    cout << "All data cleared from memory.\n";
+}
+
+void PatrolFleet::clearFiles(const string& vehiclesFile, const string& patrolsFile) {
+    try {
+        // Clear vehicles file
+        ofstream vFile(vehiclesFile, ios::trunc);
+        if (vFile.is_open()) {
+            vFile << "[]";  // Write empty JSON array
+            vFile.close();
+            cout << "Vehicles file cleared: " << vehiclesFile << "\n";
+        }
+
+        // Clear patrols file
+        ofstream pFile(patrolsFile, ios::trunc);
+        if (pFile.is_open()) {
+            pFile << "[]";  // Write empty JSON array
+            pFile.close();
+            cout << "Patrols file cleared: " << patrolsFile << "\n";
+        }
+    } catch (const exception& e) {
+        cout << "Error clearing files: " << e.what() << endl;
+    }
+}
+
+// Static Patrol methods
+Patrol* Patrol::getPatrolById(const string& id) {
+    auto it = patrolRegistry.find(id);
+    return (it != patrolRegistry.end()) ? it->second : nullptr;
+}
+
+void Patrol::clearRegistry() {
+    patrolRegistry.clear();
+    nextPatrolId = 0;
 } 

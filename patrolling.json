@@ -4,18 +4,60 @@
         "assignedConstables": [
             {
                 "assignedToPatrol": false,
-                "id": 3,
-                "name": "D",
+                "id": 11,
+                "name": "",
                 "rank": "Constable",
                 "role": "Constable",
                 "tasks": []
             }
         ],
         "endTime": "",
-        "logs": [],
+        "logs": [
+            "No Officer"
+        ],
         "patrolId": "P1",
         "startTime": "Started",
         "status": "Active",
         "vehicleId": 1
+    },
+    {
+        "area": "Valencia",
+        "assignedConstables": [
+            {
+                "assignedToPatrol": false,
+                "id": 12,
+                "name": "",
+                "rank": "Constable",
+                "role": "Constable",
+                "tasks": []
+            }
+        ],
+        "endTime": "",
+        "logs": [
+            "YAYYYY"
+        ],
+        "patrolId": "P2",
+        "startTime": "Started",
+        "status": "Active",
+        "vehicleId": 5
+    },
+    {
+        "area": "Gulberg",
+        "assignedConstables": [
+            {
+                "assignedToPatrol": false,
+                "id": 13,
+                "name": "",
+                "rank": "Constable",
+                "role": "Constable",
+                "tasks": []
+            }
+        ],
+        "endTime": "Ended",
+        "logs": [],
+        "patrolId": "P4",
+        "startTime": "Started",
+        "status": "Completed",
+        "vehicleId": 3
     }
 ]
