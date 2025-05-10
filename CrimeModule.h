@@ -81,12 +81,9 @@ public:
     // Polymorphism
     virtual void displayDetails() const override;
 
-    // Function to get case priority - will be overridden
     virtual double getPriority() const {
         return severity;
     }
-
-    //Method to get full case information as a string
     virtual string getFullInfo() const {
         stringstream ss;
         ss << "Case Type: " << type << "\n"
@@ -183,7 +180,6 @@ public:
         return priority;
     }
 
-    // Override getFullInfo to include theft-specific details
     string getFullInfo() const override {
         stringstream ss;
         ss << Case::getFullInfo();
@@ -225,8 +221,6 @@ public:
     double getPriority() const override {
         return severity + (weaponUsed ? 3.0 : 0.0) + (injurySeverity * 0.5);
     }
-
-    // Override getFullInfo to include assault-specific details
     string getFullInfo() const override {
         stringstream ss;
         ss << Case::getFullInfo();
@@ -273,7 +267,6 @@ public:
         return priority;
     }
 
-    // Override getFullInfo
     string getFullInfo() const override {
         stringstream ss;
         ss << Case::getFullInfo();
@@ -288,7 +281,6 @@ public:
 };
 
 class CrimeManager {
-    // Template class usage
     vector<Case*> cases; // Aggregation
     map<int, Case*> caseMap;
     vector<Location*> locations; //aggregation
@@ -301,7 +293,6 @@ class CrimeManager {
 public:
     CrimeManager() : totalStolenValue(0.0), highPriorityCaseCount(0) {}
 
-    // Destructor to clean up memory
     ~CrimeManager() {
         for (auto& pair : caseMap) {
             delete pair.second;
@@ -325,7 +316,7 @@ public:
     void listCasesByPriority();  // Function to demonstrate polymorphism
     void save();
     void load();
-    Case* findCase(int id);      //
+    Case* findCase(int id);      
     void filterCasesByType(const string& type);
     void showDetailedCaseReport(int id);
     void updateCaseDetails(int id);

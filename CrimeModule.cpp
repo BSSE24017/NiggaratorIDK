@@ -1,5 +1,5 @@
 #include "CrimeModule.h"
-#include <algorithm> // Added for std::sort
+#include <algorithm> // Added for sort
 #include <fstream>
 #include <stdexcept>
 #include <sstream> // For string stream operations
@@ -167,7 +167,7 @@ void CrimeManager::addCase(int id, string type, double extraInfo) {
     addCase(newCase);
 }
 
-// Location methods (aggregation)
+// Location methods (association)
 Location* CrimeManager::addLocation(const string& address, const string& city, const string& state, const string& zipCode) {
     Location* loc = new Location(address, city, state, zipCode);
     locations.push_back(loc);
@@ -608,7 +608,7 @@ void CrimeManager::updateCaseDetails(int id) {
         return;
     }
 
-    cout << "Case updated successfully.\n";
+    cout << "Case updated successfully.YAYYYY\n";
 }
 
 void CrimeManager::generateStatistics() {
@@ -1003,7 +1003,7 @@ void crimeMenu() {
                 cout << "Location added to case.\n";
             }
             else {
-                cout << "Case not found. Double-check that ID!\n";
+                cout << "Case not found. Double-check the ID!\n";
             }
             break;
         }
@@ -1070,7 +1070,7 @@ void crimeMenu() {
             cout << "All data saved.Rest Assure\n";
             break;
         case 0: // Exit
-            cout << "Saving before exit...\n";
+            cout << "Be patient.We are saving your changings before exit...\n";
             mgr.save();
             cout << "Exiting program.Byeeeeeee!\n";
             break;
