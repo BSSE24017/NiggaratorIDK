@@ -17,7 +17,7 @@
         "year": 1336
     },
     {
-        "availabilityStatus": true,
+        "availabilityStatus": false,
         "color": "",
         "engineSize": 0.0,
         "fuelType": "Petrol",

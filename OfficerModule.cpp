@@ -342,6 +342,7 @@ void officerMenu() {
                 if (officer) {
                     manager.addOfficer(officer);
                     cout << "Officer added with ID: " << officer->getId() << endl;
+                    manager.saveToJson("officers.json");
                 }
                 break;
             }

@@ -20,5 +20,18 @@
         "severity": 2.0,
         "stolenValue": 599.0,
         "type": "Theft"
+    },
+    {
+        "assignedProsecutor": {
+            "id": 3,
+            "name": "CVB",
+            "rank": "Prosecutor"
+        },
+        "date": "2024-09-31",
+        "description": "sdfghgfd",
+        "id": 4,
+        "reportedBy": "me",
+        "severity": 6.0,
+        "type": "Other"
     }
 ]
