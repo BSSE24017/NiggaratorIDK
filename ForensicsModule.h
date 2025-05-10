@@ -96,6 +96,8 @@ class ForensicLab {
     ListTemplate<LabTechnician> labTechs;
     ListTemplate<FieldAgent> fieldAgents;
     ListTemplate<Evidence> evidences;
+    
+   
 
 public:
     void addLabTech(const LabTechnician& e);
@@ -131,5 +133,7 @@ public:
 
 // ------------------------ MENU ------------------------
 void forensicsMenu();
+void searchEvidenceByCaseID();
+
 
 #endif // FORENSICSMODULE_H

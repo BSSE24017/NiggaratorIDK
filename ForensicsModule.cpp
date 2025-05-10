@@ -12,7 +12,44 @@ ForensicLabRegistry* ForensicLabRegistry::getInstance() {
 ForensicLab& ForensicLabRegistry::getLab() {
     return lab;
 }
+//map usaageee
+void searchEvidenceByCaseID() {
+    ifstream file("forensics_data.json");
+    if (!file.is_open()) {
+        cout << "Unable to open forensics_data.json" << endl;
+        return;
+    }
 
+    json data;
+    file >> data;
+
+    map<int, vector<json>> caseMap;
+
+    // Fill the map using for loop with indexing
+    for (int i = 0; i < data["evidences"].size(); i++) {
+        int caseID = data["evidences"][i]["case"];
+        caseMap[caseID].push_back(data["evidences"][i]);
+    }
+
+    int searchID;
+    cout << "Enter Case ID to search evidence for: ";
+    cin >> searchID;
+
+    if (caseMap.find(searchID) != caseMap.end()) {
+        cout << "\nEvidences for Case ID " << searchID << ":" << endl;
+        vector<json> evidences = caseMap[searchID];
+
+        for (int i = 0; i < evidences.size(); i++) {
+            cout << "---------------------------" << endl;
+            cout << "ID: " << evidences[i]["id"] << endl;
+            cout << "Description: " << evidences[i]["desc"] << endl;
+            cout << "Status: " << (evidences[i]["status"] ? "Processed " : "Pending ") << endl;
+        }
+        cout << "---------------------------" << endl;
+    } else {
+        cout << "No evidence found for Case ID " << searchID << "." << endl;
+    }
+}
 // --------- Lab Functions ---------
 void ForensicLab::addLabTech(const LabTechnician& e) {
     labTechs.add(e);
@@ -240,6 +277,7 @@ void forensicsMenu() {
         cout << "9. Display Forensics for Case\n";
         cout << "10. Check Case Progress (from Main Module)\n";
         cout << "11. Mark Case as Resolved (from Main Module)\n";
+        cout<<"12. Search Evidence by case ID\n";
         cout << "0. Save & Exit\n";
         cout << "Enter your choice, detective: ";
         cin >> choice;
@@ -328,6 +366,10 @@ void forensicsMenu() {
                 cout << "Enter Case ID to mark resolved: ";
                 cin >> id;
                 lab.markCaseResolved(id);
+                break;
+            }
+            case 12: {
+                 searchEvidenceByCaseID();
                 break;
             }
             case 0:
