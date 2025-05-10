@@ -40,6 +40,7 @@ public:
 };
 
 // ------------------------ EXPERTS ------------------------
+//abstract class
 class ForensicExpert {
 protected:
     string name;
@@ -47,10 +48,11 @@ protected:
 
 public:
     ForensicExpert(string n = "", int id = 0) : name(n), expertId(id) {}
-    virtual string getSpecialty() const = 0;
+   //ru ntime polymorphism
+
+    virtual string getSpecialty() const = 0; //pure virtual 
     int getId() const { return expertId; }
     string getName() const { return name; }
-
     virtual ~ForensicExpert() {}
 
     bool operator==(const ForensicExpert& other) const {
@@ -62,13 +64,14 @@ public:
         return os;
     }
 };
-
+//inheritance 
 class LabTechnician : public ForensicExpert {
 public:
     LabTechnician(string n = "", int id = 0) : ForensicExpert(n, id) {}
     string getSpecialty() const override { return "Lab Technician"; }
 };
 
+//inheritance 
 class FieldAgent : public ForensicExpert {
     int assignedCaseId;
 
@@ -79,7 +82,7 @@ public:
 
     int getAssignedCase() const { return assignedCaseId; }
     void setCaseId(int cid) { assignedCaseId = cid; }
-
+//friend functions 
     friend ostream& operator<<(ostream& os, const FieldAgent& f) {
         os << f.name << " (ID: " << f.expertId << ") | Assigned Case: " 
            << (f.assignedCaseId >= 0 ? to_string(f.assignedCaseId) : "None");
@@ -89,6 +92,7 @@ public:
 
 // ------------------------ FORENSIC LAB ------------------------
 class ForensicLab {
+    //templates 
     ListTemplate<LabTechnician> labTechs;
     ListTemplate<FieldAgent> fieldAgents;
     ListTemplate<Evidence> evidences;
@@ -104,9 +108,9 @@ public:
     void markEvidenceProcessed(int evId);
     void listAllEvidence();
 
-    // Interactively link (assign) evidence to a case
+    //Interactively link (assign) evidence to a case
     void linkEvidenceToCase(int caseId);
-    // Interactively link (assign) a field agent to a case
+    //  link  a field agent to a case
     void linkExpertToCase(int caseId);
     void displayForensicsForCase(int caseId);
     void checkCaseProgress(int caseId);
@@ -114,8 +118,9 @@ public:
 };
 
 // ------------------------ SINGLETON ------------------------
+//singleton classs
 class ForensicLabRegistry {
-    static ForensicLabRegistry* instance;
+    static ForensicLabRegistry* instance; //single instance 
     ForensicLab lab;
     ForensicLabRegistry() {}
 

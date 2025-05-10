@@ -168,46 +168,57 @@ void ForensicLab::markCaseResolved(int caseId) {
         return;
     }
     cout << "\nMarking Case #" << caseId << " as resolved...\n";
-    cout << "Case marked as resolved (for demonstration, no status field in Case).\n";
+    
     cout << "Put two and two together, and surprisingly it wasn't five this time." << endl;
 }
 
 // --------- Save & Load ---------
 void ForensicLab::save() {
-    json data;
-    for (const auto& ev : evidences) {
-        data["evidences"].push_back({
-            {"id", ev.getId()},
-            {"desc", ev.getDescription()},
-            {"status", ev.getStatus()},
-            {"case", ev.getCaseId()}
-        });
-    }
+    try {
+        json data;
+        for (const auto& ev : evidences) {
+            data["evidences"].push_back({
+                {"id", ev.getId()},
+                {"desc", ev.getDescription()},
+                {"status", ev.getStatus()},
+                {"case", ev.getCaseId()}
+            });
+        }
 
-    ofstream file("forensics_data.json");
-    file << setw(4) << data;
-    file.close();
-    cout << "Data saved. Hope no one hacks us now!\n";
-    cout << "Broke the case with nothing but intuition and a slightly overconfident attitude." << endl;
+        ofstream file("forensics_data.json");
+        if (!file.is_open()) throw runtime_error("Could not open file for saving data.");
+        
+        file << setw(4) << data;
+        file.close();
+
+        cout << "Data saved. Hope no one hacks us now!\n";
+
+    } catch (const exception& e) {
+        cout << "[Error - Save] " << e.what() << endl;
+    }
 }
-
 void ForensicLab::load() {
-    ifstream file("forensics_data.json");
-    if (!file.is_open()) {
-        cout << "No saved file found. Starting fresh like a new crime scene.\n";
-        return;
+    try {
+        ifstream file("forensics_data.json");
+        if (!file.is_open()) {
+            cout << "No saved file found. Starting fresh like a new crime scene.\n";
+            return;
+        }
+
+        json data;
+        file >> data;
+
+        evidences.clear();
+        for (const auto& e : data["evidences"])
+            evidences.add(Evidence(e["id"], e["desc"], e["status"], e["case"]));
+
+        file.close();
+
+        cout << "Data loaded. Tried to be cool and say 'Elementary', but I tripped on the evidence bag." << endl;
+
+    } catch (const exception& e) {
+        cout << "[Error - Load] " << e.what() << endl;
     }
-
-    json data;
-    file >> data;
-
-    evidences.clear();
-    for (const auto& e : data["evidences"])
-        evidences.add(Evidence(e["id"], e["desc"], e["status"], e["case"]));
-
-    file.close();
-    cout << "Data loaded. Welcome back, detective!\n";
-    cout << "Tried to be cool and say 'Elementary', but I tripped on the evidence bag." << endl;
 }
 
 // --------- Menu ---------
