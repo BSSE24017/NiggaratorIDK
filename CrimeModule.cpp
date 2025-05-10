@@ -1,6 +1,7 @@
 #include "CrimeModule.h"
 #include <algorithm> // Added for std::sort
 #include <fstream>
+#include <stdexcept>
 #include <sstream> // For string stream operations
 using json = nlohmann::json;
 

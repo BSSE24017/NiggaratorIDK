@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <stdexcept>
 #include <algorithm> 
 #include <sstream> // For string stream operations
 #include "nlohmann/json.hpp"
