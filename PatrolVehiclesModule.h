@@ -1,5 +1,4 @@
 #pragma once
-#include "ListTemplate.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -12,7 +11,13 @@
 using json = nlohmann::json;
 using namespace std;
 
-class Vehicle {
+class DisplayVehicleInfo {
+public:
+    virtual void displayInfo() const = 0;
+    virtual ~DisplayVehicleInfo() = default;
+};
+
+class Vehicle : public DisplayVehicleInfo {
 protected:
     string type;
     int vehicleId;
@@ -70,6 +75,7 @@ public:
 
     virtual json toJson() const;
     virtual void fromJson(const json& j);
+    void displayInfo() const override;
     friend ostream& operator<<(ostream& os, const Vehicle& v);
 };
 
@@ -79,6 +85,7 @@ public:
     Car(int id);
     json toJson() const override;
     void fromJson(const json& j) override;
+    void displayInfo() const override;
 };
 
 class Bike : public Vehicle {
@@ -87,9 +94,10 @@ public:
     Bike(int id);
     json toJson() const override;
     void fromJson(const json& j) override;
+    void displayInfo() const override;
 };
 
-class Patrol {
+class Patrol : public DisplayVehicleInfo {
 private:
     string patrolId;
     string area;
@@ -119,14 +127,14 @@ public:
 
     // Methods
     void addLog(const string& logEntry);
-    void displayInfo() const;
+    void displayInfo() const override;
     json toJson() const;
     void fromJson(const json& j);
     friend ostream& operator<<(ostream& os, const Patrol& p);
 };
 
 class PatrolFleet {
-    ListTemplate<Vehicle> vehicles;
+    vector<Vehicle> vehicles;
     map<int, Vehicle> vehicleMap;
     map<string, Patrol> patrols;  // patrolId -> Patrol
     static int nextPatrolId;
@@ -134,8 +142,8 @@ public:
     PatrolFleet();
     void addVehicle(const Vehicle& v);
     void listVehicles();
-    const ListTemplate<Vehicle>& getVehicles() const;
-    ListTemplate<Vehicle>& getVehicles();
+    const vector<Vehicle>& getVehicles() const;
+    vector<Vehicle>& getVehicles();
     bool searchVehicle(int id) const;
     const Vehicle& getVehicle(int id) const;
     bool updateVehicleStatus(int id, const string& status);

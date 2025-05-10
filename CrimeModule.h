@@ -1,5 +1,4 @@
 #pragma once
-#include "ListTemplate.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -17,16 +16,22 @@ using namespace std;
 // Forward declaration for Location class
 class Location;
 
-class Case {
+class DisplayCrimeInfo {
+public:
+    virtual void displayDetails() const = 0;
+    virtual ~DisplayCrimeInfo() = default;
+}; 
+
+class Case : public DisplayCrimeInfo {
 protected:
     string type;
     int caseId;
     double severity;
-    Location* location; // Association(specifically aggregation)
+    Location* location; // Association
     string description; 
     string reportedBy; 
     string date;
-    Prosecutor* assignedProsecutor; // New field for assigned Prosecutor
+    Prosecutor* assignedProsecutor; // Aggregation
 
 public:
     Case(string t = "", int id = 0, double sev = 0.0)
@@ -74,7 +79,7 @@ public:
     Prosecutor* getAssignedProsecutor() const { return assignedProsecutor; }
 
     // Polymorphism
-    virtual void displayDetails() const;
+    virtual void displayDetails() const override;
 
     // Function to get case priority - will be overridden
     virtual double getPriority() const {
@@ -284,9 +289,9 @@ public:
 
 class CrimeManager {
     // Template class usage
-    ListTemplate<Case*> cases; // Aggregation
+    vector<Case*> cases; // Aggregation
     map<int, Case*> caseMap;
-    ListTemplate<Location*> locations; //aggregation
+    vector<Location*> locations; //aggregation
 
     //Statistics tracking
     map<string, int> caseTypeCount;

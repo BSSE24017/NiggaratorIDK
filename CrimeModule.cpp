@@ -117,7 +117,7 @@ void Vandalism::displayDetails() const {
 }
 
 void CrimeManager::addCase(Case* c) {
-    cases.add(c);
+    cases.push_back(c);
     caseMap[c->getId()] = c;
 
     // Update statistics
@@ -170,7 +170,7 @@ void CrimeManager::addCase(int id, string type, double extraInfo) {
 // Location methods (aggregation)
 Location* CrimeManager::addLocation(const string& address, const string& city, const string& state, const string& zipCode) {
     Location* loc = new Location(address, city, state, zipCode);
-    locations.add(loc);
+    locations.push_back(loc);
     return loc;
 }
 
@@ -694,7 +694,7 @@ void CrimeManager::deleteCase(int id) {
 
         // Free memory and remove from containers
         delete caseToDelete;
-        cases.removeAt(index);
+        cases.erase(cases.begin() + index);
         caseMap.erase(it);
 
         cout << "Case " << id << " deleted successfully.\n";

@@ -1,5 +1,4 @@
 #pragma once
-#include "ListTemplate.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -130,7 +129,7 @@ public:
 
 // Composition: OfficerManager "has" officers
 class OfficerManager {
-    ListTemplate<Officer*> officers;  // Changed to store pointers
+    vector<Officer*> officers;  // Changed to store pointers
     map<int, Officer*> officerMap;  // Changed to store pointers
 public:
     ~OfficerManager();
@@ -146,7 +145,7 @@ public:
     void loadFromJson(const string& filename);
     
     // Getter for officers
-    const ListTemplate<Officer*>& getOfficers() const { return officers; }
+    const vector<Officer*>& getOfficers() const { return officers; }
 
     // Get all available constables
     vector<Constable> getAvailableConstables() const;

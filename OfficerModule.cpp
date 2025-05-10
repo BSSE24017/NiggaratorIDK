@@ -122,7 +122,7 @@ OfficerManager::~OfficerManager() {
 }
 
 void OfficerManager::addOfficer(Officer* o) {
-    officers.add(o);
+    officers.push_back(o);
     officerMap[o->getId()] = o;
 }
 

@@ -41,47 +41,85 @@ ostream& operator<<(ostream& os, const Vehicle& v) {
 }
 
 json Vehicle::toJson() const {
-    return json{
-        {"type", type},
-        {"vehicleId", vehicleId},
-        {"model", model},
-        {"year", year},
-        {"color", color},
-        {"licensePlate", licensePlate},
-        {"mileage", mileage},
-        {"fuelType", fuelType},
-        {"engineSize", engineSize},
-        {"transmissionType", transmissionType},
-        {"numSeats", numSeats},
-        {"vehicleClass", vehicleClass},
-        {"maintenanceHistory", maintenanceHistory},
-        {"availabilityStatus", availabilityStatus},
-        {"price", price}
-    };
+    try {
+        return json{
+            {"type", type},
+            {"vehicleId", vehicleId},
+            {"model", model},
+            {"year", year},
+            {"color", color},
+            {"licensePlate", licensePlate},
+            {"mileage", mileage},
+            {"fuelType", fuelType},
+            {"engineSize", engineSize},
+            {"transmissionType", transmissionType},
+            {"numSeats", numSeats},
+            {"vehicleClass", vehicleClass},
+            {"maintenanceHistory", maintenanceHistory},
+            {"availabilityStatus", availabilityStatus},
+            {"price", price}
+        };
+    } catch (const exception& e) {
+        cout << "Error serializing Vehicle to JSON: " << e.what() << endl;
+        return json{};
+    }
 }
 
 void Vehicle::fromJson(const json& j) {
-    type = j.value("type", "");
-    vehicleId = j.value("vehicleId", 0);
-    model = j.value("model", "");
-    year = j.value("year", 0);
-    color = j.value("color", "");
-    licensePlate = j.value("licensePlate", "");
-    mileage = j.value("mileage", 0.0);
-    fuelType = j.value("fuelType", "");
-    engineSize = j.value("engineSize", 0.0);
-    transmissionType = j.value("transmissionType", "");
-    numSeats = j.value("numSeats", 0);
-    vehicleClass = j.value("vehicleClass", "");
-    maintenanceHistory = j.value("maintenanceHistory", "");
-    availabilityStatus = j.value("availabilityStatus", true);
-    price = j.value("price", 0.0);
+    try {
+        type = j.value("type", "");
+        vehicleId = j.value("vehicleId", 0);
+        model = j.value("model", "");
+        year = j.value("year", 0);
+        color = j.value("color", "");
+        licensePlate = j.value("licensePlate", "");
+        mileage = j.value("mileage", 0.0);
+        fuelType = j.value("fuelType", "");
+        engineSize = j.value("engineSize", 0.0);
+        transmissionType = j.value("transmissionType", "");
+        numSeats = j.value("numSeats", 0);
+        vehicleClass = j.value("vehicleClass", "");
+        maintenanceHistory = j.value("maintenanceHistory", "");
+        availabilityStatus = j.value("availabilityStatus", true);
+        price = j.value("price", 0.0);
+    } catch (const exception& e) {
+        cout << "Error deserializing Vehicle from JSON: " << e.what() << endl;
+    }
 }
 
-json Car::toJson() const { return Vehicle::toJson(); }
-void Car::fromJson(const json& j) { Vehicle::fromJson(j); }
-json Bike::toJson() const { return Vehicle::toJson(); }
-void Bike::fromJson(const json& j) { Vehicle::fromJson(j); }
+json Car::toJson() const {
+    try {
+        return Vehicle::toJson();
+    } catch (const exception& e) {
+        cout << "Error serializing Car to JSON: " << e.what() << endl;
+        return json{};
+    }
+}
+
+void Car::fromJson(const json& j) {
+    try {
+        Vehicle::fromJson(j);
+    } catch (const exception& e) {
+        cout << "Error deserializing Car from JSON: " << e.what() << endl;
+    }
+}
+
+json Bike::toJson() const {
+    try {
+        return Vehicle::toJson();
+    } catch (const exception& e) {
+        cout << "Error serializing Bike to JSON: " << e.what() << endl;
+        return json{};
+    }
+}
+
+void Bike::fromJson(const json& j) {
+    try {
+        Vehicle::fromJson(j);
+    } catch (const exception& e) {
+        cout << "Error deserializing Bike from JSON: " << e.what() << endl;
+    }
+}
 
 // Patrol constructors
 Patrol::Patrol() : vehicleId(0), status("Inactive"), startTime(""), endTime("") {}
@@ -93,35 +131,44 @@ Patrol::Patrol(string id, string area, int vehicleId, const vector<Constable>& c
 }
 
 json Patrol::toJson() const {
-    json constablesArr = json::array();
-    for (const auto& c : assignedConstables)
-        constablesArr.push_back(c.toJson());
-    return json{
-        {"patrolId", patrolId},
-        {"area", area},
-        {"vehicleId", vehicleId},
-        {"status", status},
-        {"startTime", startTime},
-        {"endTime", endTime},
-        {"logs", logs},
-        {"assignedConstables", constablesArr}
-    };
+    try {
+        json constablesArr = json::array();
+        for (const auto& c : assignedConstables)
+            constablesArr.push_back(c.toJson());
+        return json{
+            {"patrolId", patrolId},
+            {"area", area},
+            {"vehicleId", vehicleId},
+            {"status", status},
+            {"startTime", startTime},
+            {"endTime", endTime},
+            {"logs", logs},
+            {"assignedConstables", constablesArr}
+        };
+    } catch (const exception& e) {
+        cout << "Error serializing Patrol to JSON: " << e.what() << endl;
+        return json{};
+    }
 }
 void Patrol::fromJson(const json& j) {
-    patrolId = j.value("patrolId", "");
-    area = j.value("area", "");
-    vehicleId = j.value("vehicleId", 0);
-    status = j.value("status", "Inactive");
-    startTime = j.value("startTime", "");
-    endTime = j.value("endTime", "");
-    logs = j.value("logs", std::vector<std::string>{});
-    assignedConstables.clear();
-    if (j.contains("assignedConstables")) {
-        for (const auto& jc : j["assignedConstables"]) {
-            Constable c;
-            c.fromJson(jc);
-            assignedConstables.push_back(c);
+    try {
+        patrolId = j.value("patrolId", "");
+        area = j.value("area", "");
+        vehicleId = j.value("vehicleId", 0);
+        status = j.value("status", "Inactive");
+        startTime = j.value("startTime", "");
+        endTime = j.value("endTime", "");
+        logs = j.value("logs", std::vector<std::string>{});
+        assignedConstables.clear();
+        if (j.contains("assignedConstables")) {
+            for (const auto& jc : j["assignedConstables"]) {
+                Constable c;
+                c.fromJson(jc);
+                assignedConstables.push_back(c);
+            }
         }
+    } catch (const exception& e) {
+        cout << "Error deserializing Patrol from JSON: " << e.what() << endl;
     }
 }
 
@@ -172,12 +219,12 @@ ostream& operator<<(ostream& os, const Patrol& p) {
 
 // PatrolFleet constructors
 PatrolFleet::PatrolFleet() {}
-const ListTemplate<Vehicle>& PatrolFleet::getVehicles() const { return vehicles; }
-ListTemplate<Vehicle>& PatrolFleet::getVehicles() { return vehicles; }
+const vector<Vehicle>& PatrolFleet::getVehicles() const { return vehicles; }
+vector<Vehicle>& PatrolFleet::getVehicles() { return vehicles; }
 
 // PatrolFleet implementations
 void PatrolFleet::addVehicle(const Vehicle& v) {
-    vehicles.add(v);
+    vehicles.push_back(v);
     vehicleMap[v.getId()] = v;
 }
 
@@ -271,53 +318,69 @@ const Patrol& PatrolFleet::getPatrol(const string& patrolId) const {
 
 // PatrolFleet JSON persistence
 void PatrolFleet::saveVehiclesToFile(const string& filename) const {
-    json jArr = json::array();
-    for (const auto& pair : vehicleMap) {
-        jArr.push_back(pair.second.toJson());
+    try {
+        json jArr = json::array();
+        for (const auto& pair : vehicleMap) {
+            jArr.push_back(pair.second.toJson());
+        }
+        std::ofstream file(filename);
+        if (file) file << jArr.dump(4);
+    } catch (const exception& e) {
+        cout << "Error saving vehicles to file: " << e.what() << endl;
     }
-    std::ofstream file(filename);
-    if (file) file << jArr.dump(4);
 }
 
 void PatrolFleet::loadVehiclesFromFile(const string& filename) {
-    std::ifstream file(filename);
-    if (!file) return;
-    json jArr;
-    file >> jArr;
-    vehicles.clear();
-    vehicleMap.clear();
-    for (const auto& jv : jArr) {
-        string type = jv.value("type", "");
-        Vehicle* v = nullptr;
-        if (type == "Car") v = new Car();
-        else if (type == "Bike") v = new Bike();
-        else v = new Vehicle();
-        v->fromJson(jv);
-        vehicles.add(*v);
-        vehicleMap[v->getId()] = *v;
-        delete v;
+    try {
+        ifstream file(filename);
+        if (!file) return;
+        json jArr;
+        file >> jArr;
+        vehicles.clear();
+        vehicleMap.clear();
+        for (const auto& jv : jArr) {
+            string type = jv.value("type", "");
+            Vehicle* v = nullptr;
+            if (type == "Car") v = new Car();
+            else if (type == "Bike") v = new Bike();
+            else v = new Vehicle();
+            v->fromJson(jv);
+            vehicles.push_back(*v);
+            vehicleMap[v->getId()] = *v;
+            delete v;
+        }
+    } catch (const exception& e) {
+        cout << "Error loading vehicles from file: " << e.what() << endl;
     }
 }
 
 void PatrolFleet::savePatrolsToFile(const string& filename) const {
-    json jArr = json::array();
-    for (const auto& pair : patrols) {
-        jArr.push_back(pair.second.toJson());
+    try {
+        json jArr = json::array();
+        for (const auto& pair : patrols) {
+            jArr.push_back(pair.second.toJson());
+        }
+        std::ofstream file(filename);
+        if (file) file << jArr.dump(4);
+    } catch (const exception& e) {
+        cout << "Error saving patrols to file: " << e.what() << endl;
     }
-    std::ofstream file(filename);
-    if (file) file << jArr.dump(4);
 }
 
 void PatrolFleet::loadPatrolsFromFile(const string& filename) {
-    std::ifstream file(filename);
-    if (!file) return;
-    json jArr;
-    file >> jArr;
-    patrols.clear();
-    for (const auto& jp : jArr) {
-        Patrol p;
-        p.fromJson(jp);
-        patrols[p.getPatrolId()] = p;
+    try {
+        std::ifstream file(filename);
+        if (!file) return;
+        json jArr;
+        file >> jArr;
+        patrols.clear();
+        for (const auto& jp : jArr) {
+            Patrol p;
+            p.fromJson(jp);
+            patrols[p.getPatrolId()] = p;
+        }
+    } catch (const exception& e) {
+        cout << "Error loading patrols from file: " << e.what() << endl;
     }
 }
 
@@ -598,4 +661,19 @@ void patrolVehiclesMenu() {
             vehicleMenu(fleet);
         }
     } while (choice != 0);
+}
+
+void Vehicle::displayInfo() const {
+    cout << "Vehicle Info:" << endl;
+    cout << *this << endl;
+}
+
+void Car::displayInfo() const {
+    cout << "Car Info:" << endl;
+    cout << *this << endl;
+}
+
+void Bike::displayInfo() const {
+    cout << "Bike Info:" << endl;
+    cout << *this << endl;
 } 
